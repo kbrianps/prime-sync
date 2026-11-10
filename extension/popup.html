@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>Prime Sync</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Prime Sync</h1>
+      <span id="status" class="status">—</span>
+    </header>
+
+    <label class="field">
+      <span>Código da sala</span>
+      <div class="row">
+        <input id="room" type="text" maxlength="12" autocomplete="off" spellcheck="false" placeholder="EX: K7QX2M" />
+        <button id="generate" type="button" title="Gerar novo código">Novo</button>
+        <button id="copy" type="button" title="Copiar código">Copiar</button>
+      </div>
+    </label>
+
+    <p class="hint">Os dois precisam usar <strong>o mesmo código</strong>. Combine por chamada ou mensagem.</p>
+
+    <label class="field">
+      <span>Seu nome no chat</span>
+      <input id="name" type="text" maxlength="24" autocomplete="off" placeholder="Ex: Ana" />
+    </label>
+
+    <label class="switch">
+      <input id="enabled" type="checkbox" />
+      <span>Sincronização ativa</span>
+    </label>
+
+    <label class="switch">
+      <input id="showOverlay" type="checkbox" />
+      <span>Mostrar painel sobre o vídeo</span>
+    </label>
+
+    <button id="leave" class="leave" type="button">Sair da sala</button>
+
+    <footer>
+      <a id="open-prime" href="https://www.primevideo.com" target="_blank" rel="noreferrer">Abrir Prime Video ↗</a>
+      <span id="broker" class="broker"></span>
+    </footer>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

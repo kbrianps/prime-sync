@@ -1,0 +1,8 @@
+# artefatos gerados localmente (recriados com zip/tools)
+*.zip
+
+# sistema / editores
+.DS_Store
+Thumbs.db
+node_modules/
+*.log

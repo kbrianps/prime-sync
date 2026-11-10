@@ -1,0 +1,54 @@
+{
+  "manifest_version": 3,
+  "name": "Prime Sync",
+  "version": "1.3.1",
+  "description": "Sincroniza play, pause e avanço do Prime Video entre duas pessoas, com chat da sala.",
+  "permissions": ["storage", "alarms"],
+  "host_permissions": [
+    "https://www.primevideo.com/*",
+    "https://*.primevideo.com/*",
+    "https://*.amazon.com/gp/video/*",
+    "https://*.amazon.com.br/gp/video/*",
+    "https://*.amazon.co.uk/gp/video/*",
+    "https://*.amazon.de/gp/video/*",
+    "https://*.amazon.es/gp/video/*",
+    "https://*.amazon.com.mx/gp/video/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.primevideo.com/*",
+        "https://*.primevideo.com/*",
+        "https://*.amazon.com/gp/video/*",
+        "https://*.amazon.com.br/gp/video/*",
+        "https://*.amazon.co.uk/gp/video/*",
+        "https://*.amazon.de/gp/video/*",
+        "https://*.amazon.es/gp/video/*",
+        "https://*.amazon.com.mx/gp/video/*"
+      ],
+      "js": ["content.js"],
+      "css": ["overlay.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "Prime Sync",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "minimum_chrome_version": "100"
+}
