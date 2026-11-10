@@ -150,6 +150,11 @@ node tools/make-icons.cjs
 node tools/room.cjs SEUCODIGO
 node tools/room.cjs SEUCODIGO --say "oi"
 node tools/room.cjs SEUCODIGO --pause 90
+
+# gerar o zip para enviar (o LEIA-ME entra na raiz do pacote)
+cd extension && rm -f ../prime-sync-extension.zip \
+  && zip -qr ../prime-sync-extension.zip . \
+  && zip -qj ../prime-sync-extension.zip ../LEIA-ME.txt
 ```
 
 Depois de editar arquivos, vá em `chrome://extensions` e clique no **⟳** do
