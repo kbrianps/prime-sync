@@ -78,7 +78,7 @@ function waitFor(predicate, timeout = 15000) {
   // chat separado da sincronização
   a.publish(
     CHAT_TOPIC,
-    JSON.stringify({ v: 1, id: 'A:1', who: 'A', name: 'Ana', text: 'oi, tá me ouvindo?' })
+    JSON.stringify({ v: 1, id: 'A:1', who: 'A', name: 'Bia', text: 'oi, tá me ouvindo?' })
   );
 
   await waitFor(() => bReceived.some((m) => m.message.id === 'A:1'));

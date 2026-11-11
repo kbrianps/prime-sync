@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/player.png" alt="Control pill and room chat over the video" width="820">
+  <img src="docs/player-en.png" alt="Control pill and room chat over the video" width="820">
 </p>
 
 > **Independent project.** Prime Sync has no connection with Amazon or Prime
@@ -23,8 +23,8 @@
 > same account, within the plan's screen limit). The extension only talks to
 > the player that is already open in your browser.
 
-> The interface is in Brazilian Portuguese. Button names below are given in
-> Portuguese with a translation.
+> The interface is in English by default, with Brazilian Portuguese available
+> through the **EN | PT** switch at the top of the popup.
 
 ---
 
@@ -120,17 +120,17 @@ Do this **on both computers**.
 
 ## Step 3 — Set it up
 
-<img src="docs/popup.png" alt="Prime Sync settings window" width="300" align="right">
+<img src="docs/popup-en.png" alt="Prime Sync settings window" width="300" align="right">
 
 Click the Prime Sync icon (the ∞ in the browser toolbar):
 
-1. Open **Servidor MQTT** (MQTT server) and paste the **address** from Step 1.
-   Fill in **Usuário** (username) and **Senha** (password) if you have them.
-   No server yet? The **Usar broker.emqx.io mesmo assim** button fills in the
-   public one (read its warning).
-2. In **Seu nome no chat** (your name in the chat), type how you want to appear.
-3. In **Código da sala** (room code), click the **arrows** button to create a
-   code and the button next to it to **copy** it.
+1. Open **MQTT server** and paste the **address** from Step 1. Fill in
+   **Username** and **Password** if you have them. No server yet? The
+   **Use broker.emqx.io anyway** button fills in the public one (read its
+   warning).
+2. In **Your name in the chat**, type how you want to appear.
+3. In **Room code**, click the **arrows** button to create a code and the
+   button next to it to **copy** it.
 4. Send the other person the **room code**, the **server address** and, if
    any, the **username and password**. They fill in exactly the same on their
    computer.
@@ -147,10 +147,10 @@ The room code never expires. You can keep the same one forever.
 1. Both of you open Prime Video **on the same episode or movie**.
 2. If the Prime tab was already open before installing, press **F5** on it.
 3. The Prime Sync **pill** shows up in the bottom-left corner of the video.
-   **Green** dot and "conectado" (connected) = all good.
+   **Green** dot and "Connected" = all good.
 4. Press play. From then on, play, pause, skipping forward and back happen on
    both screens.
-5. If it drifts out of step, click **Sincronizar** (sync) on the pill.
+5. If it drifts out of step, click **Sync** on the pill.
 
 To test it: pause on your screen and check that the other one pauses too.
 
@@ -176,14 +176,14 @@ left edge of the screen; click it to bring the interface back.
 
 | On screen | Meaning |
 | --- | --- |
-| 🟢 conectado | All good |
-| 🟡 conectando… | Trying to reach the server |
-| 🟡 configure o servidor / a sala | Something is missing in the Prime Sync icon |
-| 🔴 offline | Could not reach the server |
-| `⏸ Ana pausou` | Who paused the video |
-| `⚠ sua conexão` | **Your** internet is making the video stall |
-| `⚠ Ana lenta` | The **other person's** internet is stalling |
-| `⚠ Ana sem sinal` | No news from the other person for over 25 seconds |
+| 🟢 Connected | All good |
+| 🟡 Connecting… | Trying to reach the server |
+| 🟡 Set up the server / the room | Something is missing in the Prime Sync icon |
+| 🔴 Offline | Could not reach the server |
+| `⏸ Bia paused` | Who paused the video |
+| `⚠ your connection` | **Your** internet is making the video stall |
+| `⚠ Bia lagging` | The **other person's** internet is stalling |
+| `⚠ Bia no signal` | No news from the other person for over 25 seconds |
 | `+1.4s` | Time difference between the two screens (fixed automatically) |
 
 ---
@@ -195,11 +195,11 @@ left edge of the screen; click it to bring the interface back.
 | No "Load unpacked" button | Developer mode is off | Turn the switch on and reload the page |
 | "Manifest file is missing or unreadable" | Wrong folder | Pick the folder that has `manifest.json` inside |
 | The pill does not appear on the video | Tab opened before installing | Press F5 on the Prime Video tab |
-| "configure o servidor" | Address empty or incomplete | Paste the `wss://…` address in the Prime Sync icon |
-| "O servidor recusou o login" (server refused the login) | Wrong username or password | Check both, letter by letter |
-| "Não foi possível alcançar o servidor" (could not reach the server) | Wrong address, internet, VPN or a network that blocks it | Check the address; try another network or turn the VPN off |
+| "Set up the server" | Address empty or incomplete | Paste the `wss://…` address in the Prime Sync icon |
+| "The server refused the login" | Wrong username or password | Check both, letter by letter |
+| "Could not reach the server" | Wrong address, internet, VPN or a network that blocks it | Check the address; try another network or turn the VPN off |
 | One person pauses and the other doesn't | Different code or server | Make sure both are **identical** on both computers |
-| "Clique no player uma vez" (click the player once) | The browser blocked autoplay | Click the video once |
+| "Click the player once to allow autoplay" | The browser blocked autoplay | Click the video once |
 | "Disable developer mode extensions" balloon | Normal Chrome notice | Click **Cancel**. Don't disable it |
 | Gone after restarting the computer | The folder was moved or deleted | Install again, pointing to the current folder |
 
@@ -230,7 +230,7 @@ Prime Video tab. Your settings stay saved.
 ## Limitations
 
 - **Ads:** during commercials the video time changes and sync may be lost.
-  Click **Sincronizar** when the episode comes back.
+  Click **Sync** when the episode comes back.
 - **Autoplay:** if the browser blocks it, click the player once. That covers
   the rest of the session.
 - **Small differences** are fixed by speeding up or slowing down the video by
@@ -272,7 +272,9 @@ Browser A                                      Browser B
 | `extension/content.js` | Video sync, pill and chat |
 | `extension/overlay.css` | Pill and chat styles |
 | `extension/popup.*` | Settings window |
+| `extension/i18n.js` | English and Portuguese texts |
 | `test/mqtt-lite.test.cjs` | MQTT client tests, no network |
+| `test/i18n.test.cjs` | Checks both languages have every text |
 | `test/broker.integration.cjs` | Real test against a broker |
 | `tools/room.cjs` | Terminal room monitor |
 | `tools/make-icons.cjs` | Generates the PNG icons |
@@ -314,6 +316,11 @@ sudo mosquitto_passwd -c /etc/mosquitto/passwd user
 
 Put TLS in front of it (for example, a reverse proxy such as Caddy or Nginx)
 to get a `wss://` address. Without TLS, use `ws://` only on a local network.
+
+### Adding a language
+
+Copy the `en` block in `extension/i18n.js`, translate the values and add a
+button for it in `popup.html`. `npm test` fails if a key is missing.
 
 ### Another Prime Video region
 

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Prime Sync",
   "version": "1.5.0",
-  "description": "Prime Video a dois em sincronia: play, pause e avanço juntos, com chat. Projeto independente, sem vínculo com a Amazon.",
+  "description": "Watch Prime Video together: play, pause and seek in sync, with a room chat. Independent, not affiliated with Amazon.",
   "permissions": ["storage", "alarms"],
   "host_permissions": [
     "https://www.primevideo.com/*",
@@ -29,7 +29,7 @@
         "https://*.amazon.es/gp/video/*",
         "https://*.amazon.com.mx/gp/video/*"
       ],
-      "js": ["content.js"],
+      "js": ["i18n.js", "content.js"],
       "css": ["overlay.css"],
       "run_at": "document_idle"
     }

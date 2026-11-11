@@ -5,6 +5,7 @@
 - The MQTT server is now configured in the popup (address, optional username and password). No broker ships with the extension.
 - The popup suggests the EMQX public broker as an opt-in, with its risk spelled out, and warns while it is in use.
 - New popup and in-video chat design, plus a new infinity icon.
+- English interface by default, with Brazilian Portuguese through an EN | PT switch in the popup; the overlay switches live.
 - Chat groups consecutive messages and shows the time inside each bubble.
 - "Leave room" asks for confirmation inline instead of a browser dialog.
 - Room codes use `crypto.getRandomValues`.

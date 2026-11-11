@@ -12,6 +12,7 @@
     broker: '',
     username: '',
     password: '',
+    lang: 'en',
   };
 
   const els = {
@@ -34,11 +35,39 @@
     copy: document.getElementById('copy'),
     leave: document.getElementById('leave'),
     ok: document.getElementById('ok'),
+    langButtons: document.querySelectorAll('[data-lang]'),
   };
 
-  const SERVER_HINT = els.serverHint.textContent;
   let settings = Object.assign({}, DEFAULTS);
   let leaveTimer = null;
+  let lastInfo = { status: 'idle' };
+
+  function L(key, vars) {
+    return globalThis.PrimeSyncI18n.t(settings.lang, key, vars);
+  }
+
+  function applyLanguage() {
+    document.documentElement.lang = settings.lang === 'pt' ? 'pt-BR' : 'en';
+    for (const el of document.querySelectorAll('[data-i18n]')) {
+      el.textContent = L(el.dataset.i18n);
+    }
+    for (const el of document.querySelectorAll('[data-i18n-html]')) {
+      el.innerHTML = L(el.dataset.i18nHtml);
+    }
+    for (const el of document.querySelectorAll('[data-i18n-title]')) {
+      el.title = L(el.dataset.i18nTitle);
+      el.setAttribute('aria-label', el.title);
+    }
+    for (const el of document.querySelectorAll('[data-i18n-placeholder]')) {
+      el.placeholder = L(el.dataset.i18nPlaceholder);
+    }
+    for (const button of els.langButtons) {
+      button.classList.toggle('active', button.dataset.lang === settings.lang);
+    }
+    resetLeave();
+    renderBroker();
+    renderStatus(lastInfo);
+  }
 
   function generateRoom() {
     const bytes = new Uint8Array(6);
@@ -74,25 +103,26 @@
   }
 
   function renderStatus(info) {
-    if (!settings.enabled) return setStatus('desligado', '');
-    if (!isValidBroker(settings.broker)) return setStatus('sem servidor', 'wait');
-    if (!settings.room) return setStatus('sem sala', 'wait');
+    lastInfo = info;
+    if (!settings.enabled) return setStatus(L('off'), '');
+    if (!isValidBroker(settings.broker)) return setStatus(L('noServer'), 'wait');
+    if (!settings.room) return setStatus(L('noRoom'), 'wait');
 
     const map = {
-      connected: ['conectado', 'on'],
-      connecting: ['conectando…', 'wait'],
-      offline: ['offline', 'off'],
-      idle: ['desligado', ''],
+      connected: [L('connected'), 'on'],
+      connecting: [L('connecting'), 'wait'],
+      offline: [L('offline'), 'off'],
+      idle: [L('off'), ''],
     };
     const entry = map[info.status] || map.idle;
     setStatus(entry[0], entry[1]);
 
     if (info.error === 'auth') {
-      showServerHint('O servidor recusou o login. Confira usuário e senha.', true);
+      showServerHint(L('authError'), true);
     } else if (info.error === 'unreachable' && info.status !== 'connected') {
-      showServerHint('Não foi possível alcançar o servidor. Confira o endereço.', true);
+      showServerHint(L('unreachable'), true);
     } else {
-      showServerHint(SERVER_HINT, false);
+      showServerHint(L('serverHint'), false);
     }
   }
 
@@ -104,7 +134,7 @@
 
   function renderBroker() {
     const valid = isValidBroker(settings.broker);
-    els.broker.textContent = valid ? brokerHost(settings.broker) : 'não configurado';
+    els.broker.textContent = valid ? brokerHost(settings.broker) : L('notConfigured');
     els.broker.classList.toggle('missing', !valid);
     els.brokerUrl.classList.toggle(
       'invalid',
@@ -144,9 +174,17 @@
     els.enabled.checked = settings.enabled !== false;
     els.showOverlay.checked = settings.showOverlay !== false;
     els.server.open = !isValidBroker(settings.broker);
-    renderBroker();
+    applyLanguage();
     refreshStatus();
   });
+
+  for (const button of els.langButtons) {
+    button.addEventListener('click', () => {
+      settings.lang = button.dataset.lang;
+      save();
+      applyLanguage();
+    });
+  }
 
   els.room.addEventListener('input', () => {
     const value = normalize(els.room.value);
@@ -170,10 +208,10 @@
     if (!settings.room) return;
     navigator.clipboard.writeText(settings.room).catch(() => {});
     els.copy.classList.add('done');
-    els.copy.title = 'Copiado!';
+    els.copy.title = L('copied');
     setTimeout(() => {
       els.copy.classList.remove('done');
-      els.copy.title = 'Copiar código';
+      els.copy.title = L('copyCode');
     }, 1200);
   });
 
@@ -233,17 +271,17 @@
     clearTimeout(leaveTimer);
     leaveTimer = null;
     els.leave.classList.remove('confirm');
-    els.leave.textContent = 'Sair da sala';
+    els.leave.textContent = L('leaveRoom');
   }
 
   els.leave.addEventListener('click', () => {
     if (!settings.room) {
-      setStatus('sem sala', 'wait');
+      setStatus(L('noRoom'), 'wait');
       return;
     }
     if (!leaveTimer) {
       els.leave.classList.add('confirm');
-      els.leave.textContent = 'Confirmar saída?';
+      els.leave.textContent = L('confirmLeave');
       leaveTimer = setTimeout(resetLeave, 3500);
       return;
     }

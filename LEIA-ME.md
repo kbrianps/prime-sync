@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/player.png" alt="Pílula de controle e chat da sala sobre o vídeo" width="820">
+  <img src="docs/player-pt.png" alt="Pílula de controle e chat da sala sobre o vídeo" width="820">
 </p>
 
 > **Projeto independente.** O Prime Sync não tem nenhuma ligação com a Amazon
@@ -116,9 +116,11 @@ Faça isso **nos dois computadores**.
 
 ## Passo 3 — Configurar
 
-<img src="docs/popup.png" alt="Janela de configuração do Prime Sync" width="300" align="right">
+<img src="docs/popup-pt.png" alt="Janela de configuração do Prime Sync" width="300" align="right">
 
-Clique no ícone do Prime Sync (o ∞ na barra do navegador):
+Clique no ícone do Prime Sync (o ∞ na barra do navegador). A janela abre em
+inglês: clique em **PT** no topo para mudar para português. A pílula e o chat
+no vídeo mudam juntos.
 
 1. Abra **Servidor MQTT** e cole o **endereço** do Passo 1. Se tiver,
    preencha **usuário** e **senha**. Sem servidor ainda? O botão
@@ -142,7 +144,7 @@ O código da sala não expira. Vocês podem usar o mesmo para sempre.
 1. Os dois abrem o Prime Video **no mesmo episódio ou filme**.
 2. Se a aba do Prime já estava aberta antes de instalar, aperte **F5** nela.
 3. No canto inferior esquerdo do vídeo aparece a **pílula** do Prime Sync.
-   Bolinha **verde** e "conectado" = tudo certo.
+   Bolinha **verde** e "Conectado" = tudo certo.
 4. Deem play. A partir daí, play, pause, avançar e voltar acontecem nas duas
    telas.
 5. Se sentir que saiu do ritmo, clique em **Sincronizar** na pílula.
@@ -171,14 +173,14 @@ esquerda da tela; clique nela para trazer de volta.
 
 | Na tela | O que significa |
 | --- | --- |
-| 🟢 conectado | Tudo certo |
-| 🟡 conectando… | Tentando falar com o servidor |
-| 🟡 configure o servidor / a sala | Falta preencher algo no ícone do Prime Sync |
-| 🔴 offline | Não conseguiu falar com o servidor |
-| `⏸ Ana pausou` | Quem pausou o vídeo |
+| 🟢 Conectado | Tudo certo |
+| 🟡 Conectando… | Tentando falar com o servidor |
+| 🟡 Configure o servidor / a sala | Falta preencher algo no ícone do Prime Sync |
+| 🔴 Offline | Não conseguiu falar com o servidor |
+| `⏸ Bia pausou` | Quem pausou o vídeo |
 | `⚠ sua conexão` | **Sua** internet está travando o vídeo |
-| `⚠ Ana lenta` | A internet **da outra pessoa** está travando |
-| `⚠ Ana sem sinal` | Faz mais de 25 segundos sem notícias da outra pessoa |
+| `⚠ Bia lenta` | A internet **da outra pessoa** está travando |
+| `⚠ Bia sem sinal` | Faz mais de 25 segundos sem notícias da outra pessoa |
 | `+1.4s` | Diferença de tempo entre as duas telas (a extensão corrige sozinha) |
 
 ---
@@ -190,7 +192,7 @@ esquerda da tela; clique nela para trazer de volta.
 | Não aparece "Carregar sem compactação" | Modo do desenvolvedor desligado | Ligue a chave e recarregue a página |
 | "Manifest file is missing or unreadable" | Pasta errada | Escolha a pasta que tem o `manifest.json` dentro |
 | A pílula não aparece no vídeo | Aba aberta antes de instalar | Aperte F5 na aba do Prime Video |
-| "configure o servidor" | Endereço vazio ou incompleto | Cole o endereço `wss://…` no ícone do Prime Sync |
+| "Configure o servidor" | Endereço vazio ou incompleto | Cole o endereço `wss://…` no ícone do Prime Sync |
 | "O servidor recusou o login" | Usuário ou senha errados | Confira os dois, letra por letra |
 | "Não foi possível alcançar o servidor" | Endereço errado, internet, VPN ou rede que bloqueia | Confira o endereço; teste outra rede ou desligue a VPN |
 | Um pausa e o outro não | Código ou servidor diferentes | Confira se os dois estão **iguais** nas duas máquinas |
@@ -266,7 +268,9 @@ Navegador A                                    Navegador B
 | `extension/content.js` | Sincronia do vídeo, pílula e chat |
 | `extension/overlay.css` | Visual da pílula e do chat |
 | `extension/popup.*` | Janela de configuração |
+| `extension/i18n.js` | Textos em inglês e português |
 | `test/mqtt-lite.test.cjs` | Testes do cliente MQTT, sem rede |
+| `test/i18n.test.cjs` | Confere se os dois idiomas têm todos os textos |
 | `test/broker.integration.cjs` | Teste real contra um broker |
 | `tools/room.cjs` | Monitor de sala pelo terminal |
 | `tools/make-icons.cjs` | Gera os ícones PNG |

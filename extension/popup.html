@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <title>Prime Sync</title>
@@ -12,63 +12,67 @@
         <h1>Prime Sync</h1>
         <span id="version" class="version"></span>
       </div>
+      <div class="lang" role="group" data-i18n-title="language">
+        <button type="button" data-lang="en">EN</button>
+        <button type="button" data-lang="pt">PT</button>
+      </div>
       <span id="status" class="status"><i></i><b>—</b></span>
     </header>
 
     <section class="card">
-      <label class="label" for="room">Código da sala</label>
+      <label class="label" for="room" data-i18n="roomCode"></label>
       <div class="row">
         <input id="room" class="code" type="text" maxlength="12" autocomplete="off" spellcheck="false" placeholder="XXXXXX" />
-        <button id="generate" class="icon-btn" type="button" title="Gerar novo código" aria-label="Gerar novo código">
+        <button id="generate" class="icon-btn" type="button" data-i18n-title="newCode">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.9-3.9M4 4v4h4M4 13a8 8 0 0 0 14.9 3.9M20 20v-4h-4" /></svg>
         </button>
-        <button id="copy" class="icon-btn" type="button" title="Copiar código" aria-label="Copiar código">
+        <button id="copy" class="icon-btn" type="button" data-i18n-title="copyCode">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2" /><path d="M5 15V6a2 2 0 0 1 2-2h9" /></svg>
         </button>
       </div>
-      <p class="hint">Os dois precisam usar <strong>o mesmo código</strong> e o mesmo servidor.</p>
-      <p id="publicWarn" class="warn-line" hidden>Servidor público: outras pessoas podem ver esta sala e o chat.</p>
+      <p class="hint" data-i18n-html="sameCode"></p>
+      <p id="publicWarn" class="warn-line" data-i18n="publicWarn" hidden></p>
 
-      <label class="label" for="name">Seu nome no chat</label>
-      <input id="name" type="text" maxlength="24" autocomplete="off" placeholder="Ex: Ana" />
+      <label class="label" for="name" data-i18n="chatName"></label>
+      <input id="name" type="text" maxlength="24" autocomplete="off" data-i18n-placeholder="namePlaceholder" />
     </section>
 
     <details id="server" class="card server">
       <summary>
-        <span class="label">Servidor MQTT</span>
-        <span id="broker" class="broker">não configurado</span>
+        <span class="label" data-i18n="mqttServer"></span>
+        <span id="broker" class="broker"></span>
         <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
       </summary>
       <div class="server-body">
-        <label class="label" for="brokerUrl">Endereço (WebSocket)</label>
-        <input id="brokerUrl" type="url" autocomplete="off" spellcheck="false" placeholder="wss://seu-broker.exemplo.com:8084/mqtt" />
+        <label class="label" for="brokerUrl" data-i18n="address"></label>
+        <input id="brokerUrl" type="url" autocomplete="off" spellcheck="false" placeholder="wss://your-broker.example.com:8084/mqtt" />
         <div class="row two">
           <div>
-            <label class="label" for="username">Usuário</label>
-            <input id="username" type="text" autocomplete="off" spellcheck="false" placeholder="opcional" />
+            <label class="label" for="username" data-i18n="username"></label>
+            <input id="username" type="text" autocomplete="off" spellcheck="false" data-i18n-placeholder="optional" />
           </div>
           <div>
-            <label class="label" for="password">Senha</label>
-            <input id="password" type="password" autocomplete="off" placeholder="opcional" />
+            <label class="label" for="password" data-i18n="password"></label>
+            <input id="password" type="password" autocomplete="off" data-i18n-placeholder="optional" />
           </div>
         </div>
-        <p id="serverHint" class="hint">Use um broker MQTT com WebSocket. Os dois precisam do mesmo endereço.</p>
+        <p id="serverHint" class="hint"></p>
         <div id="suggest" class="suggest">
-          <p><strong>Sem servidor?</strong> Dá para começar com o broker público e gratuito da EMQX.</p>
-          <p class="risk">Risco: ele é aberto. Qualquer pessoa conectada pode ver os códigos de sala, ler o chat e mandar play/pause para vocês.</p>
-          <button id="usePublic" class="btn ghost small" type="button">Usar broker.emqx.io mesmo assim</button>
+          <p data-i18n-html="suggestIntro"></p>
+          <p class="risk" data-i18n="suggestRisk"></p>
+          <button id="usePublic" class="btn ghost small" type="button" data-i18n="usePublic"></button>
         </div>
       </div>
     </details>
 
     <section class="card toggles">
       <label class="toggle">
-        <span>Sincronização ativa</span>
+        <span data-i18n="syncEnabled"></span>
         <input id="enabled" type="checkbox" />
         <i aria-hidden="true"></i>
       </label>
       <label class="toggle">
-        <span>Mostrar painel sobre o vídeo</span>
+        <span data-i18n="showPanel"></span>
         <input id="showOverlay" type="checkbox" />
         <i aria-hidden="true"></i>
       </label>
@@ -76,16 +80,16 @@
 
     <a id="open-prime" class="card link-row" href="https://www.primevideo.com" target="_blank" rel="noreferrer">
       <svg class="lead" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" /><path d="m10 9.5 4.5 2.5-4.5 2.5z" /></svg>
-      <span>Abrir o Prime Video</span>
+      <span data-i18n="openPrime"></span>
       <svg class="trail" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" /></svg>
     </a>
 
     <footer class="actions">
-      <button id="leave" class="btn ghost danger" type="button">Sair da sala</button>
-      <button id="ok" class="btn primary" type="button" title="Fecha esta janela — tudo já está salvo">OK</button>
+      <button id="leave" class="btn ghost danger" type="button" data-i18n="leaveRoom"></button>
+      <button id="ok" class="btn primary" type="button" data-i18n-title="okTitle">OK</button>
     </footer>
-    <p class="footnote">Tudo é salvo automaticamente.</p>
 
+    <script src="i18n.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>

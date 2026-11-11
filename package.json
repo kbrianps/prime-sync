@@ -8,7 +8,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "test": "node --test test/mqtt-lite.test.cjs",
+    "test": "node --test test/mqtt-lite.test.cjs test/i18n.test.cjs",
     "test:broker": "node test/broker.integration.cjs",
     "check": "node tools/check.cjs",
     "icons": "node tools/make-icons.cjs",

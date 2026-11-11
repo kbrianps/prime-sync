@@ -36,7 +36,7 @@
   };
 
   const state = {
-    settings: { enabled: true, room: '', showOverlay: true, name: '', broker: '' },
+    settings: { enabled: true, room: '', showOverlay: true, name: '', broker: '', lang: 'en' },
     port: null,
     video: null,
     status: 'idle',
@@ -87,6 +87,10 @@
   let guardTimer = null;
 
   /* ------------------------------------------------------------- helpers */
+
+  function L(key, vars) {
+    return globalThis.PrimeSyncI18n.t(state.settings.lang, key, vars);
+  }
 
   function round(n) {
     return Math.round(n * 1000) / 1000;
@@ -260,7 +264,7 @@
     const remote = peerHealth();
     if (remote.slow && !state.peerSlowNotified) {
       state.peerSlowNotified = true;
-      showToast((remote.name || 'Seu parceiro') + ' está com a internet ruim.');
+      showToast(L('partnerBadNet', { name: remote.name || L('yourPartner') }));
     } else if (!remote.slow) {
       state.peerSlowNotified = false;
     }
@@ -284,17 +288,17 @@
 
     if (paused && state.pausedBy) {
       text = state.pausedBy.mine
-        ? '⏸ você pausou'
-        : '⏸ ' + (state.pausedBy.name || 'parceiro') + ' pausou';
+        ? L('youPaused')
+        : L('namePaused', { name: state.pausedBy.name || L('partner') });
       tone = 'pause';
     } else if (isLocalSlow()) {
-      text = '⚠ sua conexão';
+      text = L('yourConnection');
     } else if (peerHealth().silent) {
-      text = '⚠ ' + (peerHealth().name || 'parceiro') + ' sem sinal';
+      text = L('noSignal', { name: peerHealth().name || L('partner') });
       tone = 'off';
     } else if (peerHealth().slow) {
       const name = peerHealth().name;
-      text = '⚠ ' + (name ? name + ' lenta' : 'parceiro lento');
+      text = name ? L('nameSlow', { name }) : L('partnerSlow');
     }
 
     chip.textContent = text;
@@ -629,7 +633,7 @@
         const result = video.play();
         if (result && typeof result.catch === 'function') {
           result.catch(() =>
-            showToast('Clique no player uma vez para liberar o autoplay.')
+            showToast(L('autoplay'))
           );
         }
       });
@@ -674,30 +678,30 @@
       '<span class="ps-label">Prime Sync</span>' +
       '<span class="ps-drift"></span>' +
       '<span class="ps-net"></span>' +
-      '<button class="ps-room" title="Copiar código da sala">sem sala</button>' +
-      '<button class="ps-sync" title="Puxar a posição do parceiro">' +
+      '<button class="ps-room" title="' + L('copyRoomTitle') + '">' + L('noRoom') + '</button>' +
+      '<button class="ps-sync" title="' + L('syncTitle') + '">' +
       ICONS.sync +
-      '<span>Sincronizar</span></button>' +
-      '<button class="ps-chat" title="Abrir chat da sala">' +
+      '<span>' + L('sync') + '</span></button>' +
+      '<button class="ps-chat" title="' + L('chatTitle') + '">' +
       ICONS.chat +
-      '<span>Chat</span><span class="ps-badge"></span></button>' +
-      '<button class="ps-hide" title="Esconder" aria-label="Esconder">' +
+      '<span>' + L('chat') + '</span><span class="ps-badge"></span></button>' +
+      '<button class="ps-hide" title="' + L('hide') + '" aria-label="' + L('hide') + '">' +
       ICONS.hide +
       '</button>';
 
     pill.querySelector('.ps-room').addEventListener('click', () => {
       const room = state.settings.room;
       if (!room) {
-        showToast('Abra o ícone do Prime Sync e gere um código de sala.');
+        showToast(L('needRoom'));
         return;
       }
       copy(room);
-      showToast('Código copiado: ' + room);
+      showToast(L('codeCopied', { room }));
     });
 
     pill.querySelector('.ps-sync').addEventListener('click', () => {
       requestRemoteState();
-      showToast('Pedindo a posição atual do parceiro…');
+      showToast(L('askingPosition'));
     });
 
     pill.querySelector('.ps-chat').addEventListener('click', () => {
@@ -728,7 +732,7 @@
     if (state.tab) return state.tab;
     const tab = document.createElement('div');
     tab.id = 'ps-tab';
-    tab.title = 'Mostrar o Prime Sync';
+    tab.title = L('showUi');
     tab.innerHTML =
       '<span class="ps-tab-dot"></span><span class="ps-tab-arrow">' +
       ICONS.show +
@@ -787,28 +791,28 @@
 
     if (!enabled) {
       color = '#888888';
-      text = 'desligado';
+      text = L('off');
     } else if (!broker) {
       color = '#f5b942';
-      text = 'configure o servidor';
+      text = L('setServer');
     } else if (!room) {
       color = '#f5b942';
-      text = 'configure a sala';
+      text = L('setRoom');
     } else if (state.status === 'connected') {
       color = '#2fd18b';
-      text = 'conectado';
+      text = L('connected');
     } else if (state.status === 'connecting') {
       color = '#f5b942';
-      text = 'conectando…';
+      text = L('connecting');
     } else {
       color = '#ff6b7d';
-      text = 'offline';
+      text = L('offline');
     }
 
     dot.style.background = color;
     pill.dataset.status = color === '#2fd18b' ? 'on' : '';
     label.textContent = text;
-    roomButton.textContent = room || 'sem sala';
+    roomButton.textContent = room || L('noRoom');
 
     if (state.drift && Math.abs(state.drift) > 1.2) {
       driftEl.textContent =
@@ -838,7 +842,7 @@
     const sub =
       state.chat.panel && state.chat.panel.querySelector('.ps-panel-sub');
     if (sub) {
-      sub.textContent = room ? 'Sala ' + room + ' · ' + text : text;
+      sub.textContent = room ? L('roomStatus', { room, status: text }) : text;
       state.chat.panel.querySelector('.ps-panel-dot').style.background = color;
     }
   }
@@ -851,17 +855,17 @@
     const panel = document.createElement('div');
     panel.id = 'ps-panel';
     panel.innerHTML =
-      '<div class="ps-resize" title="Arraste para redimensionar (duplo clique volta ao padrão)"></div>' +
+      '<div class="ps-resize" title="' + L('resizeTitle') + '"></div>' +
       '<div class="ps-panel-head">' +
       '<span class="ps-panel-dot"></span>' +
       '<span class="ps-panel-heading">' +
-      '<span class="ps-panel-title">Chat da sala</span>' +
+      '<span class="ps-panel-title">' + L('roomChat') + '</span>' +
       '<span class="ps-panel-sub"></span>' +
       '</span>' +
-      '<button class="ps-panel-min" title="Minimizar (só o cabeçalho)" aria-label="Minimizar">' +
+      '<button class="ps-panel-min" title="' + L('minimize') + '" aria-label="' + L('minimize') + '">' +
       ICONS.min +
       '</button>' +
-      '<button class="ps-panel-close" title="Fechar" aria-label="Fechar">' +
+      '<button class="ps-panel-close" title="' + L('close') + '" aria-label="' + L('close') + '">' +
       ICONS.close +
       '</button>' +
       '</div>' +
@@ -869,9 +873,9 @@
       '<form class="ps-compose">' +
       '<textarea class="ps-input" rows="1" maxlength="' +
       CHAT_MAX +
-      '" placeholder="Mensagem para a sala…" autocomplete="off" ' +
+      '" placeholder="' + L('messagePlaceholder') + '" autocomplete="off" ' +
       'autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>' +
-      '<button type="submit" class="ps-send" title="Enviar (Enter)" aria-label="Enviar">' +
+      '<button type="submit" class="ps-send" title="' + L('send') + '" aria-label="' + L('send') + '">' +
       ICONS.send +
       '</button>' +
       '</form>';
@@ -1024,7 +1028,7 @@
     if (!value) return false;
 
     if (!state.port || state.status !== 'connected') {
-      showToast('Sem conexão com a sala. Verifique o código e a internet.');
+      showToast(L('noConnection'));
       return false;
     }
 
@@ -1035,7 +1039,7 @@
     const payload = {
       id: WHO + ':' + (state.chat.seq += 1),
       who: WHO,
-      name: (state.settings.name || 'Alguém').slice(0, 24),
+      name: (state.settings.name || L('someone')).slice(0, 24),
       text: value,
     };
 
@@ -1055,7 +1059,7 @@
       mine: message.who === WHO,
       name: String(message.name || 'Parceiro').slice(0, 24),
       text: String(message.text).slice(0, CHAT_MAX),
-      time: new Date().toLocaleTimeString('pt-BR', {
+      time: new Date().toLocaleTimeString(globalThis.PrimeSyncI18n.locale(state.settings.lang), {
         hour: '2-digit',
         minute: '2-digit',
       }),
@@ -1091,7 +1095,7 @@
       empty.className = 'ps-empty';
       empty.innerHTML = ICONS.chat;
       const line = document.createElement('span');
-      line.textContent = 'Nada por aqui ainda. Diga oi.';
+      line.textContent = L('emptyChat');
       empty.appendChild(line);
       list.appendChild(empty);
       return;
@@ -1108,7 +1112,7 @@
       if (!continued) {
         const meta = document.createElement('span');
         meta.className = 'ps-meta';
-        meta.textContent = item.mine ? 'você' : item.name;
+        meta.textContent = item.mine ? L('you') : item.name;
         row.appendChild(meta);
       }
 
@@ -1258,6 +1262,7 @@
     chrome.storage.onChanged.addListener((changes, area) => {
       if (area !== 'local' || !changes.settings) return;
       const previousRoom = state.settings.room;
+      const previousLang = state.settings.lang;
       state.settings = Object.assign(
         {},
         state.settings,
@@ -1270,6 +1275,11 @@
         state.chat.seen = new Set();
         state.chat.unread = 0;
         renderChat(true);
+      }
+
+      if (state.settings.lang !== previousLang && state.root) {
+        state.root.remove();
+        ensureUI();
       }
 
       if (!state.settings.enabled || !state.settings.room) {
