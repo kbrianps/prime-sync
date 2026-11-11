@@ -169,3 +169,27 @@ button.leave {
 button.leave:hover {
   background: rgba(224, 79, 95, 0.22);
 }
+
+button.ok {
+  width: 100%;
+  margin-top: 10px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  border: 1px solid rgba(38, 194, 129, 0.5);
+  background: rgba(38, 194, 129, 0.18);
+  color: #d7ffec;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button.ok:hover {
+  background: rgba(38, 194, 129, 0.32);
+}
+
+.hint.small {
+  margin: 6px 0 0;
+  font-size: 10.5px;
+  text-align: center;
+  color: #6c7686;
+}

@@ -23,8 +23,9 @@ PASSO 3 — usar
   1. Abra o Prime Video e o episódio/filme.
   2. Clique no ícone do Prime Sync -> "Novo" (gera um código) -> "Copiar".
   3. Mande o código para a outra pessoa; ela cola no mesmo campo.
-  4. Dê play. A pílula no canto do vídeo fica VERDE = conectado.
-  5. Se sair do ritmo, clique em "Sincronizar".
+  4. No fim, clique em OK para fechar esta janelinha (tudo já foi salvo).
+  5. Dê play. A pílula no canto do vídeo fica VERDE = conectado.
+  6. Se sair do ritmo, clique em "Sincronizar".
 
 CHAT: o botão "Chat" (na pílula do vídeo) abre uma barra lateral para
 conversarem durante o episódio. Escolha seu nome em: ícone do Prime Sync ->

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Prime Sync",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Sincroniza play, pause e avanço do Prime Video entre duas pessoas, com chat da sala.",
   "permissions": ["storage", "alarms"],
   "host_permissions": [

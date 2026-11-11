@@ -15,6 +15,7 @@
     generate: document.getElementById('generate'),
     copy: document.getElementById('copy'),
     leave: document.getElementById('leave'),
+    ok: document.getElementById('ok'),
   };
 
   let settings = Object.assign({}, DEFAULTS);
@@ -115,6 +116,15 @@
   els.showOverlay.addEventListener('change', () => {
     settings.showOverlay = els.showOverlay.checked;
     save();
+  });
+
+  els.ok.addEventListener('click', () => {
+    window.close(); // fecha o popup da extensão
+  });
+
+  // Enter no campo do nome também fecha, como um "salvar e sair".
+  els.name.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') window.close();
   });
 
   els.leave.addEventListener('click', () => {
