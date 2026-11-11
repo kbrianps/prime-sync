@@ -1,12 +1,33 @@
-/* Prime Sync — overlay e chat dentro da página do Prime Video */
-
-/* Raiz única: fica por cima de tudo, mas não captura cliques da página. */
 #ps-root {
+  --ps-bg: rgba(10, 14, 19, 0.84);
+  --ps-bg-solid: rgba(10, 14, 19, 0.95);
+  --ps-surface: rgba(255, 255, 255, 0.06);
+  --ps-surface-hover: rgba(255, 255, 255, 0.12);
+  --ps-border: rgba(255, 255, 255, 0.1);
+  --ps-border-strong: rgba(255, 255, 255, 0.18);
+  --ps-text: #edf1f7;
+  --ps-muted: #94a0b2;
+  --ps-faint: #66727f;
+  --ps-accent: #4cc2ff;
+  --ps-accent-soft: rgba(76, 194, 255, 0.18);
+  --ps-ok: #2fd18b;
+  --ps-warn: #f5b942;
+  --ps-danger: #ff6b7d;
+  --ps-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+
   position: fixed;
   inset: 0;
   z-index: 2147483647;
   pointer-events: none;
   isolation: isolate;
+  font-family: system-ui, "Amazon Ember", "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#ps-root *,
+#ps-root *::before,
+#ps-root *::after {
+  box-sizing: border-box;
 }
 
 #ps-root > * {
@@ -17,11 +38,28 @@
   pointer-events: none;
 }
 
-#ps-root {
-  font-family: "Amazon Ember", "Segoe UI", Roboto, system-ui, sans-serif;
+#ps-root button {
+  margin: 0;
+  min-width: 0;
+  min-height: 0;
+  font: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
-/* ------------------------------------------------------------- pílula */
+#ps-root svg {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 
 #ps-pill {
   position: fixed;
@@ -29,18 +67,17 @@
   bottom: 84px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 7px 10px;
-  border-radius: 999px;
-  background: rgba(12, 14, 18, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  gap: 6px;
+  padding: 5px 5px 5px 12px;
+  border-radius: 14px;
+  background: var(--ps-bg);
+  border: 1px solid var(--ps-border);
+  box-shadow: var(--ps-shadow);
   font-size: 12px;
   font-weight: 500;
   line-height: 1.2;
-  font-family: inherit;
-  color: #f2f4f8;
-  backdrop-filter: blur(8px);
+  color: var(--ps-text);
+  backdrop-filter: blur(14px) saturate(140%);
   user-select: none;
   transition: opacity 0.2s ease;
 }
@@ -49,167 +86,196 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #888;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
+  background: var(--ps-faint);
   flex: 0 0 auto;
+  transition: background 0.2s ease;
+}
+
+#ps-pill[data-status="on"] .ps-dot {
+  box-shadow: 0 0 0 3px rgba(47, 209, 139, 0.22), 0 0 10px rgba(47, 209, 139, 0.6);
 }
 
 #ps-pill .ps-label {
-  opacity: 0.85;
+  margin-right: 2px;
+  color: var(--ps-muted);
   white-space: nowrap;
 }
 
 #ps-pill .ps-room {
-  font: inherit;
+  height: 26px;
+  padding: 0 9px;
+  border-radius: 8px;
+  border: 1px solid var(--ps-border);
+  background: var(--ps-surface);
+  color: var(--ps-text);
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-  letter-spacing: 0.08em;
-  color: #f2f4f8;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 999px;
-  padding: 3px 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   cursor: pointer;
   white-space: nowrap;
+  transition: background 0.15s ease;
 }
 
 #ps-pill .ps-room:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: var(--ps-surface-hover);
 }
 
 #ps-pill .ps-drift {
-  font-family: ui-monospace, Menlo, Consolas, monospace;
-  font-size: 11px;
-  color: #ffd479;
   display: none;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: var(--ps-warn);
   white-space: nowrap;
 }
 
 #ps-pill .ps-net {
   display: none;
-  padding: 2px 8px;
+  height: 22px;
+  padding: 0 8px;
   border-radius: 999px;
   font-size: 11px;
   font-weight: 600;
+  line-height: 20px;
   white-space: nowrap;
-  background: rgba(255, 170, 60, 0.16);
-  border: 1px solid rgba(255, 170, 60, 0.45);
-  color: #ffc46b;
+  background: rgba(245, 185, 66, 0.14);
+  border: 1px solid rgba(245, 185, 66, 0.4);
+  color: #ffd27a;
 }
 
 #ps-pill .ps-net[data-tone="pause"] {
-  background: rgba(62, 166, 255, 0.14);
-  border-color: rgba(62, 166, 255, 0.4);
-  color: #9ccfff;
+  background: var(--ps-accent-soft);
+  border-color: rgba(76, 194, 255, 0.4);
+  color: #a9e2ff;
 }
 
 #ps-pill .ps-net[data-tone="off"] {
-  background: rgba(224, 79, 95, 0.16);
-  border-color: rgba(224, 79, 95, 0.45);
-  color: #ffa3ad;
+  background: rgba(255, 107, 125, 0.14);
+  border-color: rgba(255, 107, 125, 0.4);
+  color: #ffb3bd;
 }
 
 #ps-pill button.ps-sync,
 #ps-pill button.ps-chat,
 #ps-pill button.ps-hide {
-  font: inherit;
-  color: #f2f4f8;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 9px;
+  border: 0;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 999px;
-  padding: 3px 9px;
+  color: var(--ps-text);
   cursor: pointer;
   white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 #ps-pill button.ps-sync:hover,
-#ps-pill button.ps-chat:hover,
-#ps-pill button.ps-hide:hover {
-  background: rgba(255, 255, 255, 0.14);
+#ps-pill button.ps-chat:hover {
+  background: var(--ps-surface-hover);
 }
 
-#ps-pill button.ps-chat {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+#ps-pill button.ps-sync {
+  margin-left: 2px;
+  padding-left: 12px;
+  border-left: 1px solid var(--ps-border);
+  border-radius: 0 9px 9px 0;
+}
+
+#ps-pill button.ps-sync:hover {
+  border-radius: 9px;
+}
+
+#ps-pill button.ps-hide {
+  width: 28px;
+  padding: 0;
+  justify-content: center;
+  color: var(--ps-muted);
+}
+
+#ps-pill button.ps-hide:hover {
+  background: var(--ps-surface-hover);
+  color: var(--ps-text);
 }
 
 #ps-pill .ps-badge {
   display: none;
-  min-width: 15px;
-  height: 15px;
-  padding: 0 4px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 5px;
   border-radius: 999px;
-  background: #26c281;
-  color: #06120c;
+  background: var(--ps-ok);
+  color: #04140c;
   font-size: 10px;
   font-weight: 700;
-  line-height: 15px;
+  line-height: 17px;
   text-align: center;
 }
-
-#ps-pill button.ps-hide {
-  padding: 3px 7px;
-  opacity: 0.7;
-}
-
-/* --------------------------------------------------------------- toast */
 
 #ps-toast {
   position: fixed;
   left: 24px;
-  bottom: 128px;
-  max-width: 320px;
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: rgba(12, 14, 18, 0.9);
-  border: 1px solid rgba(255, 212, 121, 0.5);
-  color: #ffe6ad;
-  font-size: 12px;
+  bottom: 132px;
+  max-width: 340px;
+  padding: 10px 14px 10px 13px;
+  border-radius: 12px;
+  background: var(--ps-bg-solid);
+  border: 1px solid var(--ps-border);
+  border-left: 3px solid var(--ps-accent);
+  color: var(--ps-text);
+  font-size: 12.5px;
   font-weight: 500;
-  line-height: 1.35;
-  font-family: inherit;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  line-height: 1.4;
+  box-shadow: var(--ps-shadow);
+  backdrop-filter: blur(14px);
   opacity: 0;
-  transform: translateY(6px);
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  transform: translateY(8px) scale(0.98);
+  transition: opacity 0.22s ease, transform 0.22s ease;
 }
 
 #ps-toast.ps-visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
 }
-
-/* ---------------------------------------------------------------- chat */
 
 #ps-panel {
   position: fixed;
   right: 20px;
   bottom: 20px;
-  width: 320px;
+  width: 340px;
   max-width: calc(100vw - 32px);
-  height: min(460px, 62vh);
+  height: min(480px, 64vh);
   min-height: 44px;
   max-height: 92vh;
   display: none;
   flex-direction: column;
-  border-radius: 14px;
-  background: rgba(10, 12, 16, 0.93);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(10px);
-  font-size: 12.5px;
-  font-weight: 500;
+  border-radius: 18px;
+  background: var(--ps-bg-solid);
+  border: 1px solid var(--ps-border);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  backdrop-filter: blur(18px) saturate(140%);
+  font-size: 13px;
+  font-weight: 450;
   line-height: 1.4;
-  font-family: inherit;
-  color: #eef1f6;
+  color: var(--ps-text);
   overflow: hidden;
 }
 
 #ps-panel.ps-open {
   display: flex;
+  animation: ps-rise 0.2s ease;
 }
 
-/* Minimizado: só o cabeçalho */
+@keyframes ps-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
 #ps-panel.ps-min {
   height: auto !important;
 }
@@ -220,89 +286,111 @@
 }
 
 #ps-panel .ps-resize {
-  flex: 0 0 10px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: ns-resize;
-  background: transparent;
   touch-action: none;
+  z-index: 1;
 }
 
 #ps-panel .ps-resize::before {
   content: "";
-  width: 44px;
+  width: 36px;
   height: 4px;
+  margin-top: 2px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.16);
   transition: background 0.15s ease;
 }
 
 #ps-panel .ps-resize:hover::before {
-  background: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.4);
 }
 
 #ps-panel.ps-min .ps-resize {
   display: none;
 }
 
-
 #ps-panel .ps-panel-head {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  gap: 10px;
+  padding: 14px 10px 12px 16px;
+  border-bottom: 1px solid var(--ps-border);
+  cursor: pointer;
+  user-select: none;
+}
+
+#ps-panel.ps-min .ps-panel-head {
+  border-bottom: 0;
+}
+
+#ps-panel .ps-panel-dot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--ps-faint);
+}
+
+#ps-panel .ps-panel-heading {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin-right: auto;
 }
 
 #ps-panel .ps-panel-title {
-  font-size: 12.5px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-size: 13.5px;
+  font-weight: 650;
+  letter-spacing: -0.005em;
 }
 
 #ps-panel .ps-panel-sub {
-  margin-left: auto;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #8b95a5;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 11px;
+  color: var(--ps-muted);
 }
 
 #ps-panel .ps-panel-min,
 #ps-panel .ps-panel-close {
-  font: inherit;
-  font-size: 15px;
-  line-height: 1;
-  color: #c9d3e0;
-  background: transparent;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
   border: 0;
-  border-radius: 6px;
-  padding: 2px 6px;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ps-muted);
   cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 #ps-panel .ps-panel-min:hover,
 #ps-panel .ps-panel-close:hover {
-  background: rgba(255, 255, 255, 0.12);
-}
-
-#ps-panel .ps-panel-min {
-  font-size: 16px;
-  padding: 0 7px 3px;
+  background: var(--ps-surface-hover);
+  color: var(--ps-text);
 }
 
 #ps-panel .ps-msgs {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px;
+  gap: 10px;
+  padding: 14px 12px;
   overflow-y: auto;
   overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
 }
 
 #ps-panel .ps-msgs::-webkit-scrollbar {
@@ -316,88 +404,144 @@
 
 #ps-panel .ps-empty {
   margin: auto;
-  color: #6c7686;
-  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--ps-faint);
+  font-size: 12.5px;
   text-align: center;
 }
 
+#ps-panel .ps-empty svg {
+  width: 30px;
+  height: 30px;
+  stroke-width: 1.5;
+  opacity: 0.7;
+}
+
 #ps-panel .ps-msg {
-  max-width: 82%;
+  position: relative;
+  max-width: 80%;
   align-self: flex-start;
-  padding: 6px 10px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 7px 11px 6px;
+  border-radius: 16px 16px 16px 5px;
+  background: #1b2430;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 #ps-panel .ps-msg.ps-mine {
   align-self: flex-end;
-  background: rgba(38, 194, 129, 0.18);
-  border-color: rgba(38, 194, 129, 0.35);
+  border-radius: 16px 16px 5px 16px;
+  background: linear-gradient(160deg, #2c9be0, #1f74b8);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+#ps-panel .ps-msg.ps-cont {
+  margin-top: -6px;
+  border-top-left-radius: 5px;
+}
+
+#ps-panel .ps-msg.ps-mine.ps-cont {
+  border-top-left-radius: 16px;
+  border-top-right-radius: 5px;
 }
 
 #ps-panel .ps-meta {
   display: block;
-  font-size: 10px;
-  line-height: 1.3;
-  color: #93a0b1;
   margin-bottom: 2px;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.3;
+  color: var(--ps-accent);
+}
+
+#ps-panel .ps-mine .ps-meta {
+  display: none;
 }
 
 #ps-panel .ps-text {
-  display: block;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+#ps-panel .ps-time {
+  float: right;
+  margin: 5px 0 -2px 10px;
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--ps-faint);
+}
+
+#ps-panel .ps-mine .ps-time {
+  color: rgba(255, 255, 255, 0.65);
 }
 
 #ps-panel .ps-compose {
   display: flex;
   align-items: flex-end;
-  gap: 6px;
-  padding: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 8px;
+  padding: 10px 10px 12px 12px;
+  border-top: 1px solid var(--ps-border);
 }
 
 #ps-panel .ps-input {
   flex: 1;
   min-width: 0;
-  padding: 8px 10px;
-  border-radius: 9px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.06);
-  color: #eef1f6;
+  margin: 0;
+  padding: 9px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--ps-border-strong);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ps-text);
   font: inherit;
   line-height: 1.35;
   resize: none;
   overflow-y: auto;
   max-height: 96px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
 #ps-panel .ps-input::placeholder {
-  color: #7b8595;
+  color: var(--ps-faint);
 }
 
 #ps-panel .ps-input:focus {
   outline: none;
-  border-color: #3ea6ff;
-  background: rgba(255, 255, 255, 0.09);
+  border-color: var(--ps-accent);
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 0 0 3px var(--ps-accent-soft);
 }
 
 #ps-panel .ps-send {
-  padding: 8px 12px;
-  border-radius: 9px;
-  border: 1px solid rgba(38, 194, 129, 0.45);
-  background: rgba(38, 194, 129, 0.2);
-  color: #d7ffec;
-  font: inherit;
+  display: grid;
+  place-items: center;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ps-accent);
+  color: #04121c;
   cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+#ps-panel .ps-send svg {
+  width: 17px;
+  height: 17px;
+  stroke-width: 2.4;
 }
 
 #ps-panel .ps-send:hover {
-  background: rgba(38, 194, 129, 0.32);
+  background: #74d0ff;
 }
 
-/* --------------------------------------------------- alça (UI escondida) */
+#ps-panel .ps-send:active {
+  transform: scale(0.94);
+}
 
 #ps-tab {
   position: fixed;
@@ -408,42 +552,40 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  width: 20px;
-  height: 54px;
-  padding: 4px 0;
+  gap: 6px;
+  width: 22px;
+  height: 58px;
   border-radius: 0 12px 12px 0;
-  background: rgba(12, 14, 18, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: var(--ps-bg);
+  border: 1px solid var(--ps-border);
   border-left: 0;
-  box-shadow: 4px 4px 14px rgba(0, 0, 0, 0.35);
-  color: #aab3c0;
+  box-shadow: var(--ps-shadow);
+  color: var(--ps-muted);
   cursor: pointer;
-  opacity: 0.7;
-  backdrop-filter: blur(8px);
+  opacity: 0.75;
+  backdrop-filter: blur(14px);
   user-select: none;
-  transition: opacity 0.15s ease, width 0.15s ease;
+  transition: opacity 0.15s ease, width 0.15s ease, color 0.15s ease;
 }
 
 #ps-tab:hover {
   opacity: 1;
-  width: 25px;
+  width: 28px;
+  color: var(--ps-text);
 }
 
 #ps-tab .ps-tab-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #888;
+  background: var(--ps-faint);
 }
 
 #ps-tab .ps-tab-arrow {
-  font-size: 13px;
-  line-height: 1;
-  color: #c9d3e0;
+  display: grid;
+  place-items: center;
 }
 
-/* Quando a interface está escondida, só a alça fica. */
 #ps-root.ps-collapsed #ps-tab {
   display: flex;
 }
@@ -453,4 +595,3 @@
 #ps-root.ps-collapsed #ps-toast {
   display: none !important;
 }
-

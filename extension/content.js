@@ -25,8 +25,18 @@
   const CHAT_HISTORY = 200;
   const MIN_PANEL_HEIGHT = 140;
 
+  const ICONS = {
+    sync: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.9-3.9M4 4v4h4M4 13a8 8 0 0 0 14.9 3.9M20 20v-4h-4"/></svg>',
+    chat: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z"/></svg>',
+    hide: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>',
+    min: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"/></svg>',
+    close: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+    send: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>',
+    show: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>',
+  };
+
   const state = {
-    settings: { enabled: true, room: '', showOverlay: true, name: '' },
+    settings: { enabled: true, room: '', showOverlay: true, name: '', broker: '' },
     port: null,
     video: null,
     status: 'idle',
@@ -283,7 +293,8 @@
       text = '⚠ ' + (peerHealth().name || 'parceiro') + ' sem sinal';
       tone = 'off';
     } else if (peerHealth().slow) {
-      text = '⚠ ' + (peerHealth().name || 'parceiro') + ' lenta';
+      const name = peerHealth().name;
+      text = '⚠ ' + (name ? name + ' lenta' : 'parceiro lento');
     }
 
     chip.textContent = text;
@@ -664,9 +675,15 @@
       '<span class="ps-drift"></span>' +
       '<span class="ps-net"></span>' +
       '<button class="ps-room" title="Copiar código da sala">sem sala</button>' +
-      '<button class="ps-sync" title="Puxar a posição do parceiro">Sincronizar</button>' +
-      '<button class="ps-chat" title="Abrir chat da sala">Chat<span class="ps-badge"></span></button>' +
-      '<button class="ps-hide" title="Esconder">×</button>';
+      '<button class="ps-sync" title="Puxar a posição do parceiro">' +
+      ICONS.sync +
+      '<span>Sincronizar</span></button>' +
+      '<button class="ps-chat" title="Abrir chat da sala">' +
+      ICONS.chat +
+      '<span>Chat</span><span class="ps-badge"></span></button>' +
+      '<button class="ps-hide" title="Esconder" aria-label="Esconder">' +
+      ICONS.hide +
+      '</button>';
 
     pill.querySelector('.ps-room').addEventListener('click', () => {
       const room = state.settings.room;
@@ -713,7 +730,9 @@
     tab.id = 'ps-tab';
     tab.title = 'Mostrar o Prime Sync';
     tab.innerHTML =
-      '<span class="ps-tab-dot"></span><span class="ps-tab-arrow">›</span>';
+      '<span class="ps-tab-dot"></span><span class="ps-tab-arrow">' +
+      ICONS.show +
+      '</span>';
 
     tab.addEventListener('click', () => {
       state.settings.showOverlay = true;
@@ -753,7 +772,7 @@
     const pill = state.overlay;
     if (!pill) return;
 
-    const { enabled, room, showOverlay } = state.settings;
+    const { enabled, room, showOverlay, broker } = state.settings;
     if (state.root) {
       state.root.classList.toggle('ps-collapsed', !showOverlay);
     }
@@ -769,21 +788,25 @@
     if (!enabled) {
       color = '#888888';
       text = 'desligado';
+    } else if (!broker) {
+      color = '#f5b942';
+      text = 'configure o servidor';
     } else if (!room) {
-      color = '#c9a227';
+      color = '#f5b942';
       text = 'configure a sala';
     } else if (state.status === 'connected') {
-      color = '#26c281';
+      color = '#2fd18b';
       text = 'conectado';
     } else if (state.status === 'connecting') {
-      color = '#c9a227';
+      color = '#f5b942';
       text = 'conectando…';
     } else {
-      color = '#e04f5f';
+      color = '#ff6b7d';
       text = 'offline';
     }
 
     dot.style.background = color;
+    pill.dataset.status = color === '#2fd18b' ? 'on' : '';
     label.textContent = text;
     roomButton.textContent = room || 'sem sala';
 
@@ -808,23 +831,15 @@
       const tabDot = state.tab.querySelector('.ps-tab-dot');
       if (tabDot) {
         tabDot.style.background =
-          state.chat.unread > 0 ? '#26c281' : color;
+          state.chat.unread > 0 ? '#2fd18b' : color;
       }
     }
 
     const sub =
       state.chat.panel && state.chat.panel.querySelector('.ps-panel-sub');
     if (sub) {
-      const parts = [];
-      if (room) parts.push(room);
-      parts.push(
-        state.status === 'connected'
-          ? 'conectado'
-          : state.status === 'connecting'
-            ? 'conectando…'
-            : 'offline'
-      );
-      sub.textContent = parts.join(' · ');
+      sub.textContent = room ? 'Sala ' + room + ' · ' + text : text;
+      state.chat.panel.querySelector('.ps-panel-dot').style.background = color;
     }
   }
 
@@ -838,10 +853,17 @@
     panel.innerHTML =
       '<div class="ps-resize" title="Arraste para redimensionar (duplo clique volta ao padrão)"></div>' +
       '<div class="ps-panel-head">' +
-      '<span class="ps-panel-title">Chat</span>' +
+      '<span class="ps-panel-dot"></span>' +
+      '<span class="ps-panel-heading">' +
+      '<span class="ps-panel-title">Chat da sala</span>' +
       '<span class="ps-panel-sub"></span>' +
-      '<button class="ps-panel-min" title="Minimizar (só o cabeçalho)">–</button>' +
-      '<button class="ps-panel-close" title="Fechar">×</button>' +
+      '</span>' +
+      '<button class="ps-panel-min" title="Minimizar (só o cabeçalho)" aria-label="Minimizar">' +
+      ICONS.min +
+      '</button>' +
+      '<button class="ps-panel-close" title="Fechar" aria-label="Fechar">' +
+      ICONS.close +
+      '</button>' +
       '</div>' +
       '<div class="ps-msgs"></div>' +
       '<form class="ps-compose">' +
@@ -849,7 +871,9 @@
       CHAT_MAX +
       '" placeholder="Mensagem para a sala…" autocomplete="off" ' +
       'autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>' +
-      '<button type="submit" class="ps-send">Enviar</button>' +
+      '<button type="submit" class="ps-send" title="Enviar (Enter)" aria-label="Enviar">' +
+      ICONS.send +
+      '</button>' +
       '</form>';
 
     getRoot().appendChild(panel);
@@ -1046,7 +1070,8 @@
 
     if (!state.chat.open && message.who !== WHO) {
       state.chat.unread += 1;
-      showToast(message.name + ': ' + truncate(message.text, 70));
+      const latest = state.chat.messages[state.chat.messages.length - 1];
+      showToast(latest.name + ': ' + truncate(latest.text, 70));
     }
     render();
   }
@@ -1064,26 +1089,41 @@
     if (!state.chat.messages.length) {
       const empty = document.createElement('div');
       empty.className = 'ps-empty';
-      empty.textContent = 'Nada por aqui ainda. Diga oi.';
+      empty.innerHTML = ICONS.chat;
+      const line = document.createElement('span');
+      line.textContent = 'Nada por aqui ainda. Diga oi.';
+      empty.appendChild(line);
       list.appendChild(empty);
       return;
     }
 
+    let previous = null;
     for (const item of state.chat.messages) {
+      const continued =
+        previous && previous.mine === item.mine && previous.name === item.name;
       const row = document.createElement('div');
-      row.className = 'ps-msg' + (item.mine ? ' ps-mine' : '');
+      row.className =
+        'ps-msg' + (item.mine ? ' ps-mine' : '') + (continued ? ' ps-cont' : '');
 
-      const meta = document.createElement('span');
-      meta.className = 'ps-meta';
-      meta.textContent = (item.mine ? 'você' : item.name) + ' · ' + item.time;
+      if (!continued) {
+        const meta = document.createElement('span');
+        meta.className = 'ps-meta';
+        meta.textContent = item.mine ? 'você' : item.name;
+        row.appendChild(meta);
+      }
 
       const text = document.createElement('span');
       text.className = 'ps-text';
       text.textContent = item.text; // textContent: nada de HTML do parceiro
 
-      row.appendChild(meta);
+      const time = document.createElement('span');
+      time.className = 'ps-time';
+      time.textContent = item.time;
+
       row.appendChild(text);
+      row.appendChild(time);
       list.appendChild(row);
+      previous = item;
     }
 
     if (atBottom || forceBottom) list.scrollTop = list.scrollHeight;
