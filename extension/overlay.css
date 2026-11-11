@@ -45,10 +45,6 @@
   transition: opacity 0.2s ease;
 }
 
-#ps-pill.ps-hidden {
-  display: none;
-}
-
 #ps-pill .ps-dot {
   width: 8px;
   height: 8px;
@@ -98,6 +94,12 @@
   background: rgba(255, 170, 60, 0.16);
   border: 1px solid rgba(255, 170, 60, 0.45);
   color: #ffc46b;
+}
+
+#ps-pill .ps-net[data-tone="pause"] {
+  background: rgba(62, 166, 255, 0.14);
+  border-color: rgba(62, 166, 255, 0.4);
+  color: #9ccfff;
 }
 
 #ps-pill .ps-net[data-tone="off"] {
@@ -394,3 +396,61 @@
 #ps-panel .ps-send:hover {
   background: rgba(38, 194, 129, 0.32);
 }
+
+/* --------------------------------------------------- alça (UI escondida) */
+
+#ps-tab {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 20px;
+  height: 54px;
+  padding: 4px 0;
+  border-radius: 0 12px 12px 0;
+  background: rgba(12, 14, 18, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-left: 0;
+  box-shadow: 4px 4px 14px rgba(0, 0, 0, 0.35);
+  color: #aab3c0;
+  cursor: pointer;
+  opacity: 0.7;
+  backdrop-filter: blur(8px);
+  user-select: none;
+  transition: opacity 0.15s ease, width 0.15s ease;
+}
+
+#ps-tab:hover {
+  opacity: 1;
+  width: 25px;
+}
+
+#ps-tab .ps-tab-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #888;
+}
+
+#ps-tab .ps-tab-arrow {
+  font-size: 13px;
+  line-height: 1;
+  color: #c9d3e0;
+}
+
+/* Quando a interface está escondida, só a alça fica. */
+#ps-root.ps-collapsed #ps-tab {
+  display: flex;
+}
+
+#ps-root.ps-collapsed #ps-pill,
+#ps-root.ps-collapsed #ps-panel,
+#ps-root.ps-collapsed #ps-toast {
+  display: none !important;
+}
+

@@ -37,10 +37,12 @@
     peers: new Map(), // who -> { seq, lastSeenAt, slow, name }
     lastStallAt: 0,
     peerSlowNotified: false,
+    pausedBy: null, // { mine: bool, name: string, at: number }
     drift: 0,
     remoteTitle: '',
     root: null,
     overlay: null,
+    tab: null,
     toastTimer: null,
     priorityTimer: null,
 
@@ -103,7 +105,7 @@
     clearTimeout(guardTimer);
     guardTimer = setTimeout(() => {
       state.applying = false;
-    }, 500);
+    }, 300);
   }
 
   /*
@@ -254,28 +256,39 @@
     }
   }
 
-  function renderNet() {
+  /*
+   * Um único chip na pílula, por ordem de importância:
+   * pausa (quem pausou) > sua conexão > parceiro lento > sem sinal.
+   */
+  function renderChip() {
     const pill = state.overlay;
     if (!pill) return;
-    const netEl = pill.querySelector('.ps-net');
-    if (!netEl) return;
+    const chip = pill.querySelector('.ps-net');
+    if (!chip) return;
 
-    const remote = peerHealth();
+    const video = state.video;
+    const paused = Boolean(video && video.paused && !video.ended);
+
     let text = '';
     let tone = 'warn';
 
-    if (isLocalSlow()) {
+    if (paused && state.pausedBy) {
+      text = state.pausedBy.mine
+        ? '⏸ você pausou'
+        : '⏸ ' + (state.pausedBy.name || 'parceiro') + ' pausou';
+      tone = 'pause';
+    } else if (isLocalSlow()) {
       text = '⚠ sua conexão';
-    } else if (remote.silent) {
-      text = '⚠ ' + (remote.name || 'parceiro') + ' sem sinal';
+    } else if (peerHealth().silent) {
+      text = '⚠ ' + (peerHealth().name || 'parceiro') + ' sem sinal';
       tone = 'off';
-    } else if (remote.slow) {
-      text = '⚠ ' + (remote.name || 'parceiro') + ' lenta';
+    } else if (peerHealth().slow) {
+      text = '⚠ ' + (peerHealth().name || 'parceiro') + ' lenta';
     }
 
-    netEl.textContent = text;
-    netEl.dataset.tone = tone;
-    netEl.style.display = text ? 'inline-block' : 'none';
+    chip.textContent = text;
+    chip.dataset.tone = tone;
+    chip.style.display = text ? 'inline-block' : 'none';
   }
 
   /* --------------------------------------------------------------- raiz */
@@ -322,15 +335,58 @@
    * acontece antes de qualquer stopPropagation nosso. Aqui só marcamos "o
    * usuário mexeu no chat"; a ação indevida é desfeita em reverts().
    */
-  function watchUiEvents() {
-    const mark = (event) => {
-      if (!state.root || !event.target) return;
-      if (state.root.contains(event.target)) {
+  /*
+   * O player do Prime escuta teclado no documento. Um listener nosso no root
+   * perde para a fase de captura dele; no window, em captura, ganhamos de
+   * qualquer listener no document/body/player. Assim o Enter do chat não chega
+   * no player. (Se o player também escutar no window, o revert() cobre.)
+   */
+  function guardPageEvents() {
+    const inside = (event) =>
+      Boolean(state.root && event.target && state.root.contains(event.target));
+
+    for (const type of ['pointerdown', 'mousedown', 'click', 'dblclick', 'wheel']) {
+      window.addEventListener(
+        type,
+        (event) => {
+          if (!inside(event)) return;
+          state.lastUiEventAt = Date.now();
+        },
+        true
+      );
+    }
+
+    window.addEventListener(
+      'keydown',
+      (event) => {
+        if (!inside(event)) return;
         state.lastUiEventAt = Date.now();
-      }
-    };
-    for (const type of ['pointerdown', 'mousedown', 'click', 'keydown']) {
-      window.addEventListener(type, mark, true);
+        event.stopImmediatePropagation(); // o player não vê esta tecla
+
+        const input = state.chat.input;
+        if (!input || event.target !== input) return;
+        // Enter envia; Shift+Enter quebra linha. Durante IME, deixa passar.
+        if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+          event.preventDefault();
+          if (sendChat(input.value)) {
+            input.value = '';
+            input.style.height = '';
+          }
+        }
+      },
+      true
+    );
+
+    for (const type of ['keyup', 'keypress']) {
+      window.addEventListener(
+        type,
+        (event) => {
+          if (!inside(event)) return;
+          state.lastUiEventAt = Date.now();
+          event.stopImmediatePropagation();
+        },
+        true
+      );
     }
   }
 
@@ -445,6 +501,12 @@
 
     if (type === 'ratechange') state.userRate = state.video.playbackRate || 1;
 
+    if (type === 'pause' && !state.video.ended) {
+      state.pausedBy = { mine: true, name: '', at: Date.now() };
+    } else if (type === 'play' || type === 'ended') {
+      state.pausedBy = null;
+    }
+
     markLocalAction();
     sendState('event');
     render();
@@ -511,7 +573,7 @@
 
     if (message.kind === 'health') {
       checkPeerHealth();
-      renderNet();
+      renderChip();
       return;
     }
 
@@ -533,6 +595,20 @@
     const drift = expected - video.currentTime;
     state.drift = drift;
     state.remoteTitle = message.title || '';
+
+    // Quem pausou: só marca na transição tocando -> pausado.
+    if (playing) {
+      state.pausedBy = null;
+    } else if (peer.playing === true || peer.playing === undefined) {
+      const mineIsFresh =
+        state.pausedBy &&
+        state.pausedBy.mine &&
+        now - state.pausedBy.at < 4000;
+      if (!mineIsFresh) {
+        state.pausedBy = { mine: false, name: peer.name || '', at: now };
+      }
+    }
+    peer.playing = playing;
 
     applyRemoteRate(video, message.rate);
 
@@ -612,16 +688,41 @@
     });
 
     pill.querySelector('.ps-hide').addEventListener('click', () => {
+      // Esconde tudo; a alça na borda traz de volta.
       state.settings.showOverlay = false;
       persistSettings();
-      pill.classList.add('ps-hidden');
-      toggleChat(false);
+      render();
     });
 
-    getRoot().appendChild(pill);
+    const root = getRoot();
+    root.appendChild(pill);
+    root.appendChild(buildTab());
     state.overlay = pill;
     state.chat.badge = pill.querySelector('.ps-badge');
     return pill;
+  }
+
+  /*
+   * "Etiqueta de roupa" na borda esquerda: única coisa visível quando a
+   * interface está escondida. Clicar restaura pílula + chat (o chat volta no
+   * estado em que estava).
+   */
+  function buildTab() {
+    if (state.tab) return state.tab;
+    const tab = document.createElement('div');
+    tab.id = 'ps-tab';
+    tab.title = 'Mostrar o Prime Sync';
+    tab.innerHTML =
+      '<span class="ps-tab-dot"></span><span class="ps-tab-arrow">›</span>';
+
+    tab.addEventListener('click', () => {
+      state.settings.showOverlay = true;
+      persistSettings();
+      render();
+    });
+
+    state.tab = tab;
+    return tab;
   }
 
   function persistSettings() {
@@ -653,7 +754,9 @@
     if (!pill) return;
 
     const { enabled, room, showOverlay } = state.settings;
-    pill.classList.toggle('ps-hidden', !showOverlay);
+    if (state.root) {
+      state.root.classList.toggle('ps-collapsed', !showOverlay);
+    }
 
     const dot = pill.querySelector('.ps-dot');
     const label = pill.querySelector('.ps-label');
@@ -699,7 +802,15 @@
       badge.style.display = unread > 0 ? 'inline-block' : 'none';
     }
 
-    renderNet();
+    renderChip();
+
+    if (state.tab) {
+      const tabDot = state.tab.querySelector('.ps-tab-dot');
+      if (tabDot) {
+        tabDot.style.background =
+          state.chat.unread > 0 ? '#26c281' : color;
+      }
+    }
 
     const sub =
       state.chat.panel && state.chat.panel.querySelector('.ps-panel-sub');
@@ -755,17 +866,6 @@
         input.style.height = '';
       }
       input.focus();
-    });
-
-    // Enter envia, Shift+Enter quebra linha.
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        if (sendChat(input.value)) {
-          input.value = '';
-          input.style.height = '';
-        }
-      }
     });
 
     input.addEventListener('input', () => {
@@ -1039,7 +1139,7 @@
 
   function loop() {
     ensureUI();
-    renderNet();
+    renderChip();
     checkPeerHealth();
 
     const video = pickVideo();
@@ -1087,6 +1187,7 @@
     const wasMin = state.chat.minimized;
     state.root = null;
     state.overlay = null;
+    state.tab = null;
     state.chat.panel = null;
     state.chat.list = null;
     state.chat.input = null;
@@ -1146,7 +1247,7 @@
   document.addEventListener('fullscreenchange', moveRootForFullscreen);
   document.addEventListener('webkitfullscreenchange', moveRootForFullscreen);
 
-  watchUiEvents();
+  guardPageEvents();
   installResize();
   loadSettings();
   setInterval(loop, 1000);
