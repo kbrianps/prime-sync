@@ -11,7 +11,13 @@
  */
 const { MqttLite } = require('../extension/mqtt-lite.js');
 
-const BROKER = process.env.BROKER || 'wss://broker.emqx.io:8084/mqtt';
+const BROKER = process.env.BROKER || '';
+const AUTH = { username: process.env.BROKER_USER || '', password: process.env.BROKER_PASS || '' };
+
+if (!/^wss?:\/\//.test(BROKER)) {
+  console.error('Defina BROKER, ex.: BROKER=wss://seu-broker:8084/mqtt [BROKER_USER=... BROKER_PASS=...]');
+  process.exit(1);
+}
 const WHO = 'cli-' + Math.random().toString(36).slice(2, 8);
 
 function arg(name) {
@@ -66,6 +72,7 @@ console.log('');
 
 const client = new MqttLite(BROKER, {
   keepalive: 20,
+    ...AUTH,
   autoReconnect: true,
   onStatus: (state) => {
     if (state === 'connected') log('REDE', 'conectado ao broker');

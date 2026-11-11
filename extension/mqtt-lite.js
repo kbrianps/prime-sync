@@ -57,6 +57,8 @@
         opts.clientId ||
         'primesync-' + Math.random().toString(36).slice(2, 10);
       this.keepalive = opts.keepalive || 30;
+      this.username = opts.username || '';
+      this.password = opts.password || '';
       this.autoReconnect = opts.autoReconnect !== false;
       this.onMessage = opts.onMessage || null;
       this.onStatus = opts.onStatus || null;
@@ -83,6 +85,7 @@
 
     connect() {
       this.closedByUser = false;
+      this.refusedCode = 0;
       this._status('connecting');
 
       return new Promise((resolve, reject) => {
@@ -128,7 +131,13 @@
           this.connected = false;
           this._stopPing();
           this._status('disconnected');
-          if (wasConnected) done(null);
+          if (wasConnected) {
+            done(null);
+          } else {
+            const err = new Error('conexão encerrada antes do CONNACK');
+            err.code = this.refusedCode || 0;
+            done(err);
+          }
           if (!this.closedByUser) this._scheduleReconnect();
         };
 
@@ -140,16 +149,25 @@
     }
 
     _sendConnect() {
-      const body = concat([
+      const withUser = Boolean(this.username);
+      const withPassword = withUser && Boolean(this.password);
+      let flags = 0x02; // clean session
+      if (withUser) flags |= 0x80;
+      if (withPassword) flags |= 0x40;
+
+      const parts = [
         encodeString('MQTT'),
         Uint8Array.from([
           0x04, // protocol level 3.1.1
-          0x02, // clean session
+          flags,
           (this.keepalive >> 8) & 0xff,
           this.keepalive & 0xff,
         ]),
         encodeString(this.clientId),
-      ]);
+      ];
+      if (withUser) parts.push(encodeString(this.username));
+      if (withPassword) parts.push(encodeString(this.password));
+      const body = concat(parts);
       this._rawSend(buildPacket(1, 0, body));
     }
 
@@ -269,7 +287,15 @@
           const waiters = this.connectWaiters.splice(0);
           waiters.forEach((fn) => fn());
         } else {
+          this.refusedCode = payload[1];
           this._status('error', 'CONNACK ' + payload[1]);
+          if (this.ws) {
+            try {
+              this.ws.close();
+            } catch (err) {
+              /* ignorado */
+            }
+          }
         }
         return;
       }
