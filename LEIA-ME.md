@@ -34,7 +34,7 @@
 5. [Passo 4 — Assistir juntos](#passo-4--assistir-juntos)
 6. [Chat da sala](#chat-da-sala)
 7. [O que a pílula mostra](#o-que-a-pílula-mostra)
-8. [Se der errado](#se-der-errado)
+8. [Problemas comuns](#problemas-comuns)
 9. [Privacidade e segurança](#privacidade-e-segurança)
 10. [Limitações](#limitações)
 11. [Para desenvolvedores](#para-desenvolvedores)
@@ -185,24 +185,62 @@ esquerda da tela; clique nela para trazer de volta.
 
 ---
 
-## Se der errado
+## Problemas comuns
 
-| O que acontece | Causa provável | O que fazer |
+Ache o lugar onde você vê o problema e depois a linha que combina com ele.
+
+### Na instalação
+
+| O que aparece | Por quê | O que fazer |
 | --- | --- | --- |
 | Não aparece "Carregar sem compactação" | Modo do desenvolvedor desligado | Ligue a chave e recarregue a página |
-| "Manifest file is missing or unreadable" | Pasta errada | Escolha a pasta que tem o `manifest.json` dentro |
-| A pílula não aparece no vídeo | Aba aberta antes de instalar | Aperte F5 na aba do Prime Video |
-| "Configure o servidor" | Endereço vazio ou incompleto | Cole o endereço `wss://…` no ícone do Prime Sync |
-| "O servidor recusou o login" | Usuário ou senha errados | Confira os dois, letra por letra |
-| "Não foi possível alcançar o servidor" | Endereço errado, internet, VPN ou rede que bloqueia | Confira o endereço; teste outra rede ou desligue a VPN |
-| Um pausa e o outro não | Código ou servidor diferentes | Confira se os dois estão **iguais** nas duas máquinas |
-| Aviso "Clique no player uma vez" | O navegador bloqueou o play automático | Clique uma vez no vídeo |
-| Balão "Desativar extensões do modo de desenvolvedor" | Aviso normal do Chrome | Clique em **Cancelar**. Não desative |
+| "Manifest file is missing or unreadable" | Pasta errada | Escolha a pasta que tem o `manifest.json` dentro, não a pasta em volta dela |
+| Dois cartões do Prime Sync na lista | Uma versão nova foi descompactada em outra pasta | Remova o cartão a mais e descompacte **por cima** da pasta original |
+| Balão "Desativar extensões do modo de desenvolvedor" | Aviso normal do Chrome | Clique em **Cancelar**. Se desativar, a sincronia para |
 | Sumiu depois de reiniciar o computador | A pasta foi movida ou apagada | Instale de novo apontando para a pasta atual |
 
-**Atualizar para uma versão nova:** descompacte **por cima da mesma pasta**,
-vá em `chrome://extensions`, clique no **⟳** do cartão do Prime Sync e aperte
-F5 na aba do Prime Video. Suas configurações continuam salvas.
+### No popup (ícone do Prime Sync)
+
+| O que aparece | Por quê | O que fazer |
+| --- | --- | --- |
+| "Sem servidor" depois de atualizar de uma versão antiga | Desde a 1.5.0 o servidor não vem embutido | Preencha **Servidor MQTT** (Passo 1 e Passo 3) |
+| Campo do endereço fica vermelho | Não começa com `wss://` ou `ws://` | Cole o endereço completo, por exemplo `wss://abc123.exemplo-mqtt.cloud:8884/mqtt` |
+| "O servidor recusou o login" | Usuário ou senha errados | Confira os dois, letra por letra, inclusive maiúsculas |
+| "Não foi possível alcançar o servidor" | Endereço errado, sem internet, VPN ou rede que bloqueia a porta | Confira o endereço. Redes de empresa, escola e hotel costumam bloquear portas como 8084 e 8884: teste outra rede ou um servidor na porta 443 |
+| Fica parado em "Conectando…" | As mesmas causas acima | O mesmo que acima |
+| Dúvida entre `0` e `O`, ou `1` e `I` | — | Os códigos gerados pelo botão de setinhas nunca usam `I`, `O`, `0` nem `1` |
+
+### No vídeo
+
+| O que aparece | Por quê | O que fazer |
+| --- | --- | --- |
+| A pílula não aparece | Aba aberta antes de instalar ou atualizar | Aperte **F5** na aba do Prime Video |
+| Pílula diz "Offline", mas o popup diz "Conectado" | A extensão foi atualizada e a aba ainda roda a versão antiga | Aperte **F5** na aba do Prime Video |
+| Um pausa e o outro não | Código da sala ou servidor diferentes | Abra o popup nos dois computadores e compare **letra por letra** |
+| Pula para um tempo estranho | Vocês estão em episódios diferentes | Os dois abrem o mesmo episódio e clicam em **Sincronizar** |
+| Fica dessincronizando ou indo e voltando | A internet de alguém está lenta (a pílula mostra `⚠ sua conexão` ou `⚠ Bia lenta`) | Espere alguns segundos. Se continuar, pause, deixe o vídeo carregar e dê play de novo |
+| Dessincronizou depois de um anúncio | Anúncios mudam o tempo do vídeo e podem ser diferentes para cada um | Clique em **Sincronizar** quando o episódio voltar |
+| O vídeo pausa ou toca sem ninguém mexer | No servidor público, outra pessoa pode estar usando o mesmo código | Gere um código novo no botão de setinhas ou troque para um servidor privado |
+| "Clique no player uma vez para liberar o autoplay" | O navegador bloqueou o play automático | Clique uma vez no vídeo. Fica liberado para o resto da sessão |
+| O Prime Video avisa que há telas demais tocando | O Prime Video limita quantas telas tocam ao mesmo tempo na mesma conta | Feche o Prime Video em outros aparelhos ou usem duas contas |
+| Legenda ou idioma do áudio diferentes | Cada um escolhe os seus; a extensão não mexe nisso | Escolham as mesmas opções no menu do player |
+| A pílula cobre parte da imagem | — | Clique na setinha `‹` da pílula para esconder. Clique na alça na borda esquerda para trazer de volta |
+| `⚠ Bia sem sinal` enquanto ela está em outra aba | O navegador desacelera abas em segundo plano com o vídeo pausado | Mantenham a aba do Prime Video visível nos dois computadores |
+
+### No chat
+
+| O que aparece | Por quê | O que fazer |
+| --- | --- | --- |
+| "Sem conexão com a sala" ao enviar | Sem conexão com o servidor | Resolva a conexão primeiro (veja a tabela do popup acima) |
+| A outra pessoa aparece como "Alguém" (ou "Someone") | Ela não preencheu o nome | Peça para preencher **Seu nome no chat** |
+| Mensagens antigas sumiram | O chat não fica salvo | É esperado: fechar ou recarregar a aba apaga a conversa |
+| Sair da sala apagou o chat | Cada sala tem sua própria conversa | Use o mesmo código de novo para voltar |
+
+### Atualizar para uma versão nova
+
+Descompacte **por cima da mesma pasta**, vá em `chrome://extensions`, clique
+no **⟳** do cartão do Prime Sync e aperte **F5** na aba do Prime Video. Suas
+configurações continuam salvas.
 
 ---
 

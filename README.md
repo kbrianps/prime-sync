@@ -37,7 +37,7 @@
 5. [Step 4 — Watch together](#step-4--watch-together)
 6. [Room chat](#room-chat)
 7. [What the pill shows](#what-the-pill-shows)
-8. [Troubleshooting](#troubleshooting)
+8. [Common problems](#common-problems)
 9. [Privacy and security](#privacy-and-security)
 10. [Limitations](#limitations)
 11. [For developers](#for-developers)
@@ -188,24 +188,62 @@ left edge of the screen; click it to bring the interface back.
 
 ---
 
-## Troubleshooting
+## Common problems
 
-| What happens | Likely cause | What to do |
+Find the place where you see the problem, then the line that matches it.
+
+### Installing
+
+| What you see | Why | What to do |
 | --- | --- | --- |
 | No "Load unpacked" button | Developer mode is off | Turn the switch on and reload the page |
-| "Manifest file is missing or unreadable" | Wrong folder | Pick the folder that has `manifest.json` inside |
-| The pill does not appear on the video | Tab opened before installing | Press F5 on the Prime Video tab |
-| "Set up the server" | Address empty or incomplete | Paste the `wss://…` address in the Prime Sync icon |
-| "The server refused the login" | Wrong username or password | Check both, letter by letter |
-| "Could not reach the server" | Wrong address, internet, VPN or a network that blocks it | Check the address; try another network or turn the VPN off |
-| One person pauses and the other doesn't | Different code or server | Make sure both are **identical** on both computers |
-| "Click the player once to allow autoplay" | The browser blocked autoplay | Click the video once |
-| "Disable developer mode extensions" balloon | Normal Chrome notice | Click **Cancel**. Don't disable it |
+| "Manifest file is missing or unreadable" | Wrong folder | Pick the folder that has `manifest.json` inside, not the folder around it |
+| A second Prime Sync card in the list | A new version was unzipped into another folder | Remove the extra card and unzip **over** the original folder |
+| "Disable developer mode extensions" balloon | Normal Chrome notice | Click **Cancel**. If you disable it, sync stops |
 | Gone after restarting the computer | The folder was moved or deleted | Install again, pointing to the current folder |
 
-**Updating to a new version:** unzip **over the same folder**, go to
-`chrome://extensions`, click **⟳** on the Prime Sync card and press F5 on the
-Prime Video tab. Your settings stay saved.
+### The popup (Prime Sync icon)
+
+| What you see | Why | What to do |
+| --- | --- | --- |
+| "No server" after updating from an older version | Since 1.5.0 the server is not built in | Fill in **MQTT server** (Step 1 and Step 3) |
+| Address field turns red | It does not start with `wss://` or `ws://` | Paste the full address, for example `wss://abc123.example-mqtt.cloud:8884/mqtt` |
+| "The server refused the login" | Wrong username or password | Check both, letter by letter, including uppercase letters |
+| "Could not reach the server" | Wrong address, no internet, VPN, or a network that blocks the port | Check the address. Office, school and hotel networks often block ports like 8084 and 8884: try another network or a server on port 443 |
+| Stuck on "Connecting…" | Same causes as above | Same as above |
+| Confused between `0` and `O`, or `1` and `I` | — | Codes created by the arrows button never use `I`, `O`, `0` or `1` |
+
+### On the video
+
+| What you see | Why | What to do |
+| --- | --- | --- |
+| The pill does not appear | Tab opened before installing or updating | Press **F5** on the Prime Video tab |
+| Pill says "Offline" but the popup says "Connected" | The extension was updated and the tab still runs the old version | Press **F5** on the Prime Video tab |
+| One person pauses and the other doesn't | Different room code or server | Open the popup on both computers and compare **letter by letter** |
+| Jumps to a strange time | You are on different episodes | Both open the same episode, then click **Sync** |
+| Keeps drifting or jumping back and forth | One person's internet is slow (the pill shows `⚠ your connection` or `⚠ Bia lagging`) | Wait a few seconds. If it continues, pause, let the video load and play again |
+| Out of sync after an ad | Ads change the video time and may differ between you | Click **Sync** when the episode comes back |
+| Video pauses or plays when nobody touched it | On the public server, someone else may be using the same code | Create a new code with the arrows button, or switch to a private server |
+| "Click the player once to allow autoplay" | The browser blocked automatic play | Click the video once. It stays allowed for the session |
+| Prime Video says too many screens are playing | Prime Video limits how many screens play at once on the same account | Close Prime Video on other devices, or use two accounts |
+| Subtitles or audio language differ | Each person chooses their own; the extension does not change them | Pick the same options in the player menu |
+| The pill covers part of the picture | — | Click `‹` on the pill to hide it. Click the handle on the left edge to bring it back |
+| `⚠ Bia no signal` while she is in another tab | The browser slows down background tabs with a paused video | Keep the Prime Video tab visible on both computers |
+
+### In the chat
+
+| What you see | Why | What to do |
+| --- | --- | --- |
+| "Not connected to the room" when sending | No connection to the server | Fix the connection first (see the popup table above) |
+| The other person shows up as "Someone" (or "Alguém") | They did not fill in their name | Ask them to fill in **Your name in the chat** |
+| Old messages disappeared | The chat is not saved | That is expected: closing or reloading the tab clears it |
+| Leaving the room cleared the chat | Each room has its own conversation | Use the same code again to rejoin |
+
+### Updating to a new version
+
+Unzip **over the same folder**, go to `chrome://extensions`, click **⟳** on the
+Prime Sync card and press **F5** on the Prime Video tab. Your settings stay
+saved.
 
 ---
 
