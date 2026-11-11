@@ -1,168 +1,331 @@
-# Prime Sync
+<p align="center">
+  <img src="extension/icons/icon128.png" width="96" height="96" alt="Prime Sync icon">
+</p>
 
-Extensão de navegador que mantém o Prime Video de **duas pessoas em sincronia**:
-quando um dá play, pausa, avança ou muda a velocidade, o outro acompanha em
-menos de um segundo.
+<h1 align="center">Prime Sync</h1>
 
-Feita para o caso "mesma conta, duas telas": o Prime Video permite até 3
-reproduções simultâneas na mesma conta, mas não tem recurso de "assistir juntos".
-Esta extensão cobre essa lacuna.
+<p align="center">
+  Watch Prime Video together, each person in their own home.<br>
+  When one of you plays, pauses or skips, the other screen does the same.
+</p>
+
+<p align="center">
+  <a href="LEIA-ME.md">🇧🇷 Português</a> · 🇺🇸 English
+</p>
+
+<p align="center">
+  <img src="docs/player.png" alt="Control pill and room chat over the video" width="820">
+</p>
+
+> **Independent project.** Prime Sync has no connection with Amazon or Prime
+> Video, is not endorsed by them, and holds no rights to the service, its
+> trademarks or its content. Each person needs their own subscription (or the
+> same account, within the plan's screen limit). The extension only talks to
+> the player that is already open in your browser.
+
+> The interface is in Brazilian Portuguese. Button names below are given in
+> Portuguese with a translation.
 
 ---
 
-## Como funciona
+## Contents
+
+1. [What you need](#what-you-need)
+2. [Step 1 — Choose a server](#step-1--choose-a-server)
+3. [Step 2 — Install the extension](#step-2--install-the-extension)
+4. [Step 3 — Set it up](#step-3--set-it-up)
+5. [Step 4 — Watch together](#step-4--watch-together)
+6. [Room chat](#room-chat)
+7. [What the pill shows](#what-the-pill-shows)
+8. [Troubleshooting](#troubleshooting)
+9. [Privacy and security](#privacy-and-security)
+10. [Limitations](#limitations)
+11. [For developers](#for-developers)
+12. [License](#license)
+
+---
+
+## What you need
+
+- **Chrome, Edge or Brave** on a computer (it does not work on phones or TVs).
+- **Prime Video** open in the browser, on both computers.
+- **An MQTT server** that both of you use (see Step 1).
+- About **10 minutes** the first time. After that, just open and watch.
+
+---
+
+## Step 1 — Choose a server
+
+Think of the server as a **mail carrier**: when you pause, the extension sends
+it a note saying "paused at 12:30", and it delivers that note right away to the
+other person's browser. The technical name for this carrier is an **MQTT
+broker**.
+
+The extension **does not ship with a server**. You pick one and both of you
+use the same one. All you need from it is an **address that starts with
+`wss://`** (and, if the service asks for one, a username and password).
+
+| Option | Good for | Cost |
+| --- | --- | --- |
+| **Hosted cloud service** (for example, the free plan of HiveMQ Cloud or EMQX Cloud Serverless) | People who don't want to install anything | Free for two people |
+| **Your own server** (Mosquitto on a computer or VPS you own) | People who already run servers | Whatever your server costs |
+| **EMQX public broker** (`wss://broker.emqx.io:8084/mqtt`) | Trying it right now, without signing up | Free |
+
+With a cloud service, the path is usually:
+
+1. Create an account on the service's website.
+2. Create a server on the free plan (sometimes called a *cluster* or *deployment*).
+3. Create a **username and password** to connect (look for *credentials* or *authentication*).
+4. Copy the **WebSocket over TLS** address. It starts with `wss://` and
+   usually ends in `/mqtt`, for example
+   `wss://abc123.example-mqtt.cloud:8884/mqtt`.
+
+Keep the address, username and password. You will paste them in Step 3 and
+send them to the other person.
+
+> ⚠️ **About the EMQX public broker.** It is run by the company behind EMQX
+> and is reliable, but it is **open**: anyone connected to it can see room
+> codes, read the chat and send play/pause to you. Use it for testing, or if
+> that does not bother you. The popup has a button that fills in this address,
+> always with the warning. For private conversations, prefer a service with a
+> username and password.
+
+---
+
+## Step 2 — Install the extension
+
+Do this **on both computers**.
+
+1. Get the `prime-sync-extension.zip` file (whoever built the package sends it
+   by chat, Drive, etc.) and unzip it:
+   - **Windows:** right-click the file → **Extract All** → **Extract**.
+   - **Mac:** double-click the file.
+2. Move the folder to a permanent place, such as **Documents**.
+   ⚠️ Do not delete, move or rename this folder later. The extension runs
+   straight from it.
+3. Open the browser and type in the address bar:
+   - Chrome: `chrome://extensions`
+   - Edge: `edge://extensions`
+   - Brave: `brave://extensions`
+4. Turn on **Developer mode** (Chrome and Brave: top-right corner;
+   Edge: left menu).
+5. Click **Load unpacked** and choose the folder that has the `manifest.json`
+   file inside it.
+6. Pin the icon: click the **puzzle piece** in the browser toolbar, then the
+   **pin** next to *Prime Sync*.
+
+> The extension is not in the Chrome Web Store, so installation is manual.
+
+---
+
+## Step 3 — Set it up
+
+<img src="docs/popup.png" alt="Prime Sync settings window" width="300" align="right">
+
+Click the Prime Sync icon (the ∞ in the browser toolbar):
+
+1. Open **Servidor MQTT** (MQTT server) and paste the **address** from Step 1.
+   Fill in **Usuário** (username) and **Senha** (password) if you have them.
+   No server yet? The **Usar broker.emqx.io mesmo assim** button fills in the
+   public one (read its warning).
+2. In **Seu nome no chat** (your name in the chat), type how you want to appear.
+3. In **Código da sala** (room code), click the **arrows** button to create a
+   code and the button next to it to **copy** it.
+4. Send the other person the **room code**, the **server address** and, if
+   any, the **username and password**. They fill in exactly the same on their
+   computer.
+5. Click **OK**. Everything is saved automatically.
+
+The room code never expires. You can keep the same one forever.
+
+<br clear="right">
+
+---
+
+## Step 4 — Watch together
+
+1. Both of you open Prime Video **on the same episode or movie**.
+2. If the Prime tab was already open before installing, press **F5** on it.
+3. The Prime Sync **pill** shows up in the bottom-left corner of the video.
+   **Green** dot and "conectado" (connected) = all good.
+4. Press play. From then on, play, pause, skipping forward and back happen on
+   both screens.
+5. If it drifts out of step, click **Sincronizar** (sync) on the pill.
+
+To test it: pause on your screen and check that the other one pauses too.
+
+---
+
+## Room chat
+
+- Click **Chat** on the pill to open the conversation next to the video.
+- Type and press **Enter** to send (**Shift+Enter** for a new line).
+- With the chat closed, new messages show up as a notice in the corner and as
+  a counter on the **Chat** button.
+- You can **minimize** it (the `–` button or a click on the title) and
+  **resize** it by dragging the bar at the top. Double-click the bar to go
+  back to the default size.
+- **The conversation is not saved.** Close the tab and it is gone.
+
+To hide everything, click the `‹` arrow on the pill. A handle stays on the
+left edge of the screen; click it to bring the interface back.
+
+---
+
+## What the pill shows
+
+| On screen | Meaning |
+| --- | --- |
+| 🟢 conectado | All good |
+| 🟡 conectando… | Trying to reach the server |
+| 🟡 configure o servidor / a sala | Something is missing in the Prime Sync icon |
+| 🔴 offline | Could not reach the server |
+| `⏸ Ana pausou` | Who paused the video |
+| `⚠ sua conexão` | **Your** internet is making the video stall |
+| `⚠ Ana lenta` | The **other person's** internet is stalling |
+| `⚠ Ana sem sinal` | No news from the other person for over 25 seconds |
+| `+1.4s` | Time difference between the two screens (fixed automatically) |
+
+---
+
+## Troubleshooting
+
+| What happens | Likely cause | What to do |
+| --- | --- | --- |
+| No "Load unpacked" button | Developer mode is off | Turn the switch on and reload the page |
+| "Manifest file is missing or unreadable" | Wrong folder | Pick the folder that has `manifest.json` inside |
+| The pill does not appear on the video | Tab opened before installing | Press F5 on the Prime Video tab |
+| "configure o servidor" | Address empty or incomplete | Paste the `wss://…` address in the Prime Sync icon |
+| "O servidor recusou o login" (server refused the login) | Wrong username or password | Check both, letter by letter |
+| "Não foi possível alcançar o servidor" (could not reach the server) | Wrong address, internet, VPN or a network that blocks it | Check the address; try another network or turn the VPN off |
+| One person pauses and the other doesn't | Different code or server | Make sure both are **identical** on both computers |
+| "Clique no player uma vez" (click the player once) | The browser blocked autoplay | Click the video once |
+| "Disable developer mode extensions" balloon | Normal Chrome notice | Click **Cancel**. Don't disable it |
+| Gone after restarting the computer | The folder was moved or deleted | Install again, pointing to the current folder |
+
+**Updating to a new version:** unzip **over the same folder**, go to
+`chrome://extensions`, click **⟳** on the Prime Sync card and press F5 on the
+Prime Video tab. Your settings stay saved.
+
+---
+
+## Privacy and security
+
+- **No account data** (email, password, card) goes through the extension.
+- What travels through the server: the video position, whether it is playing
+  or paused, the speed, the episode title, your chat name and the messages.
+- Everything goes **only through the server you configured**. The extension
+  talks to nothing else.
+- The **room code works like a password** between the two of you. Don't
+  share it.
+- On a **public server without a password** (like the EMQX one), the code
+  does not protect you: anyone connected can listen to every room at once and
+  send commands. The popup shows a yellow warning while it is in use. For
+  privacy, use a server with a username and password.
+- The server username and password are stored in your browser, in the
+  extension's local storage.
+
+---
+
+## Limitations
+
+- **Ads:** during commercials the video time changes and sync may be lost.
+  Click **Sincronizar** when the episode comes back.
+- **Autoplay:** if the browser blocks it, click the player once. That covers
+  the rest of the session.
+- **Small differences** are fixed by speeding up or slowing down the video by
+  up to 8% for a few seconds, which you won't notice. Only differences above
+  1.6s become a jump.
+- **Supported regions:** `primevideo.com` and `amazon.com`, `.com.br`,
+  `.co.uk`, `.de`, `.es` and `.com.mx` (`/gp/video/` pages). Another region?
+  See below how to add it.
+
+---
+
+## For developers
+
+### How it works
 
 ```
-Chrome A ──► service worker A ──┐
-                                ├──► broker MQTT público (broker.emqx.io)
-Chrome B ──► service worker B ──┘
+Browser A                                      Browser B
+┌───────────────┐                            ┌───────────────┐
+│ content.js    │ ◄── Prime Video player     │ content.js    │
+│      │        │                            │      │        │
+│ background.js │ ◄──── MQTT broker (WSS) ──►│ background.js │
+└───────────────┘     configured by the user └───────────────┘
 ```
 
-- Cada aba do Prime Video encontra o `<video>` do player e publica um pequeno
-  JSON (`posição`, `tocando`, `velocidade`, `título`) num tópico privado.
-- O tópico é derivado do **código da sala** (ex.: `K7QX2M`) → `primesync/v1/K7QX2M`.
-- O outro navegador recebe, compara com a posição local e, se estiver mais de
-  ~0,9s fora, corrige. Play/pause/velocidade são aplicados na hora.
-- Sem servidor para hospedar: usa um broker MQTT público via WebSocket (WSS).
+- `content.js` finds the player's `<video>`, publishes the local state and
+  applies the remote state. It also draws the pill and the chat.
+- `background.js` (service worker) keeps **one** MQTT connection and bridges
+  it with the tabs.
+- Topics: `primesync/v1/<CODE>` for sync and `primesync/v1/<CODE>/chat` for
+  chat. Messages are JSON with `v: 1`.
+- `mqtt-lite.js` is a minimal MQTT 3.1.1 client (QoS 0, username/password)
+  with no dependencies.
 
-### Arquivos
-
-| Arquivo | Papel |
+| File | Role |
 | --- | --- |
-| `extension/manifest.json` | Manifesto MV3, sites e permissões |
-| `extension/background.js` | Service worker: mantém a conexão MQTT e faz a ponte com as abas |
-| `extension/mqtt-lite.js` | Cliente MQTT 3.1.1 mínimo (QoS 0), sem dependências |
-| `extension/content.js` | Acha o vídeo, envia estado, aplica o estado remoto e desenha pílula + chat |
-| `extension/overlay.css` | Painel flutuante e barra lateral de chat |
-| `extension/popup.*` | Configuração: código da sala, ligar/desligar, copiar código |
-| `test/mqtt-lite.test.cjs` | Testa a troca de mensagens real contra o broker |
-| `tools/make-icons.cjs` | Gera os ícones PNG |
+| `extension/manifest.json` | MV3 manifest, sites and permissions |
+| `extension/background.js` | MQTT connection and bridge with tabs |
+| `extension/mqtt-lite.js` | MQTT client over WebSocket |
+| `extension/content.js` | Video sync, pill and chat |
+| `extension/overlay.css` | Pill and chat styles |
+| `extension/popup.*` | Settings window |
+| `test/mqtt-lite.test.cjs` | MQTT client tests, no network |
+| `test/broker.integration.cjs` | Real test against a broker |
+| `tools/room.cjs` | Terminal room monitor |
+| `tools/make-icons.cjs` | Generates the PNG icons |
+| `tools/check.cjs` | Validates manifest, versions and syntax |
 
----
+### Commands
 
-## Instalação (nos dois computadores)
-
-1. Copie a pasta `extension/` para a máquina da outra pessoa
-   (ou envie `prime-sync-extension.zip` e peça para descompactar).
-2. Abra `chrome://extensions` (no Edge: `edge://extensions`, no Brave:
-   `brave://extensions`).
-3. Ligue **Modo do desenvolvedor** (canto superior direito).
-4. Clique em **Carregar sem compactação** e selecione a pasta `extension`.
-5. Fixe o ícone do Prime Sync na barra do navegador (ícone de peça → alfinete).
-
-> A extensão não é publicada na Chrome Web Store, então esse passo manual é
-> necessário nas duas máquinas. Depois disso, ela atualiza sozinha quando o
-> navegador reinicia.
-
----
-
-## Uso
-
-1. Cada um abre o Prime Video e o mesmo episódio/filme.
-2. Clique no ícone do Prime Sync → **Novo** para gerar um código de sala →
-   **Copiar** e mande para a outra pessoa.
-3. A outra pessoa cola o código no campo e clica Enter.
-4. Dê play. A pílula no canto inferior esquerdo do vídeo deve ficar **verde
-   (conectado)**.
-5. Se algo sair do ritmo, clique em **Sincronizar** na pílula (ou pausar e dar
-   play novamente).
-
-O código da sala pode ser o mesmo para sempre — não expira, é só um nome de
-tópico.
-
-### Chat da sala
-
-Ao lado de "Sincronizar", o botão **Chat** abre uma barra lateral com a conversa
-das duas pessoas. É só digitar e apertar Enter.
-
-- Funciona no mesmo broker e no mesmo código de sala da sincronização, mas em
-  um tópico separado (`primesync/v1/<CÓDIGO>/chat`).
-- Seu nome aparece no chat; ajuste em **ícone do Prime Sync → "Seu nome no
-  chat"**.
-- Com a barra fechada, mensagens novas mostram um aviso no canto e um contador
-  no botão **Chat**.
-- **Não fica salvo**: o chat existe enquanto a janela dos dois estiver aberta na
-  sala. Fechou a aba, a conversa foi embora (o broker público não guarda
-  histórico). Por isso não use para nada que precise durar.
-- Nada é renderizado como HTML: o texto do parceiro entra como texto puro.
-- Dá para **minimizar** no botão `–` (ou clicando no cabeçalho) e
-  **redimensionar** arrastando o pegador no topo da barra (duplo clique volta
-  ao tamanho padrão; a altura fica salva).
-- Para sair da sala: ícone do Prime Sync → **Sair da sala**. O chat é limpo e a
-  sincronização para até você usar um código de novo.
-
-### Indicador de conexão
-
-A pílula mostra quem está com problema, não só que existe um problema:
-
-| Na tela | Significado |
-| --- | --- |
-| `⚠ sua conexão` | **você** está travando (buffer/`waiting`) agora ou nos últimos 8s |
-| `⚠ Ana lenta` | o **parceiro** avisou que está travando |
-| `⚠ Ana sem sinal` | 25s sem nenhuma mensagem dele (aba suspensa ou internet caída) |
-
-Na primeira vez que o outro começa a travar aparece um aviso no canto. O
-`+1.4s` continua sendo outra coisa: é a diferença de posição entre os dois, não
-a qualidade da rede.
-
----
-
-## Limites conhecidos
-
-- **Anúncios**: na faixa com anúncios, o player pode trocar de stream e o tempo
-  exibido muda; o sync pode se perder durante o comercial. Dê **Sincronizar**
-  depois que o episódio voltar.
-- **Autoplay**: se o navegador bloquear o `play()` automático, a pílula avisa
-  "Clique no player uma vez". Um clique resolve para o resto da sessão.
-- **Drift de rede**: tolerância de ~0,6s tocando e ~0,4s pausado. Acima disso a
-  extensão corrige sozinha. O tempo de rede entre vocês aparece como `+0.3s` na
-  pílula quando passa de 1,2s.
-- **Como a correção é feita**: diferenças pequenas são compensadas mudando a
-  velocidade em até 8% por alguns segundos (imperceptível, sem rebufferizar);
-  só diferenças acima de 1,6s viram seek. Depois de um seek há uma pausa de 4s
-  e, se o player local estiver carregando, nenhuma correção é aplicada — é isso
-  que evita o "puxa-empurra" quando a internet de um dos dois está ruim.
-  ⚠️ **Privacidade**: o broker é público. Quem souber o código da sala consegue
-  publicar comandos de play/pause e ler o chat. Use códigos longos/aleatórios
-  (o botão **Novo** gera 6 caracteres de um alfabeto de 32 = ~1 bilhão de
-  combinações) e não compartilhe o código fora da conversa de vocês. Nenhum dado
-  de conta, e-mail ou senha passa pela extensão — só posição do vídeo, título do
-  episódio e as mensagens do chat.
-- **Regiões**: o Prime Video em `primevideo.com` e nas páginas
-  `amazon.*/gp/video/*` (BR, US, UK, DE, ES, MX) estão cobertos. Outra região?
-  Adicione o padrão em `manifest.json` (em `content_scripts.matches`).
-
----
-
-## Desenvolvimento
+Requires Node.js 22 or newer. There are no dependencies to install.
 
 ```bash
-# testar o cliente MQTT contra o broker real (precisa de internet)
-node test/mqtt-lite.test.cjs
+npm test                 # offline MQTT client tests
+npm run check            # manifest, versions and syntax
 
-# usar o broker alternativo
-BROKER=wss://broker.hivemq.com:8884/mqtt node test/mqtt-lite.test.cjs
+# real test and room monitor (need a broker)
+BROKER=wss://your-broker:8884/mqtt BROKER_USER=user BROKER_PASS=pass npm run test:broker
+BROKER=wss://your-broker:8884/mqtt npm run room -- K7QX2M
+BROKER=wss://your-broker:8884/mqtt npm run room -- K7QX2M --say "hi"
 
-# regerar ícones
-node tools/make-icons.cjs
-
-# monitorar a sala pelo terminal (teste sem segundo navegador)
-node tools/room.cjs SEUCODIGO
-node tools/room.cjs SEUCODIGO --say "oi"
-node tools/room.cjs SEUCODIGO --pause 90
-
-# gerar o zip para enviar (o LEIA-ME entra na raiz do pacote)
-cd extension && rm -f ../prime-sync-extension.zip \
-  && zip -qr ../prime-sync-extension.zip . \
-  && zip -qj ../prime-sync-extension.zip ../LEIA-ME.txt
+npm run icons            # regenerate the icons
+npm run zip              # build prime-sync-extension.zip (with README, LEIA-ME and LICENSE)
 ```
 
-Depois de editar arquivos, vá em `chrome://extensions` e clique no **⟳** do
-cartão do Prime Sync (e recarregue a aba do Prime Video).
+After editing, click **⟳** on the card in `chrome://extensions` and reload the
+Prime Video tab.
 
-### Broker próprio (opcional)
+### Your own broker with Mosquitto
 
-O app funciona com qualquer broker MQTT 3.1.1 acessível por WebSocket. Para
-mais privacidade, troque a lista `BROKERS` em `extension/background.js` por um
-broker seu (Mosquitto com `listener 8083` + `protocol websockets`, ou EMQX
-Cloud free tier). Basta uma URL `wss://.../mqtt`.
+```conf
+# /etc/mosquitto/conf.d/prime-sync.conf
+listener 8083
+protocol websockets
+allow_anonymous false
+password_file /etc/mosquitto/passwd
+```
+
+```bash
+sudo mosquitto_passwd -c /etc/mosquitto/passwd user
+```
+
+Put TLS in front of it (for example, a reverse proxy such as Caddy or Nginx)
+to get a `wss://` address. Without TLS, use `ws://` only on a local network.
+
+### Another Prime Video region
+
+Add the address pattern to `extension/manifest.json`, in both
+`host_permissions` and `content_scripts.matches`.
+
+---
+
+## License
+
+[GPL-3.0](LICENSE). You may use, study, modify and redistribute it, as long as
+modified versions you distribute stay open under the same license.
+
+Prime Video and Amazon are trademarks of Amazon.com, Inc. or its affiliates.
+This project is not affiliated with, sponsored or endorsed by them.

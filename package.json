@@ -1,0 +1,18 @@
+{
+  "name": "prime-sync",
+  "version": "1.5.0",
+  "private": true,
+  "description": "Extensão de navegador que sincroniza o Prime Video entre duas pessoas, com chat da sala.",
+  "license": "GPL-3.0-only",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test test/mqtt-lite.test.cjs",
+    "test:broker": "node test/broker.integration.cjs",
+    "check": "node tools/check.cjs",
+    "icons": "node tools/make-icons.cjs",
+    "room": "node tools/room.cjs",
+    "zip": "rm -f prime-sync-extension.zip && (cd extension && zip -qr ../prime-sync-extension.zip .) && zip -qr prime-sync-extension.zip LEIA-ME.md README.md LICENSE docs"
+  }
+}
