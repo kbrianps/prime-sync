@@ -14,7 +14,8 @@ project with no connection to Amazon.
 | Title and episode number on screen | To warn when people are watching different episodes | The MQTT server you configured |
 | The name you type in "Your name in the chat" | To show who paused, who is in the room and who wrote each message | The MQTT server you configured |
 | Chat messages | To deliver them to the room | The MQTT server you configured |
-| Room code, server address, server username and password, interface preferences | To connect to your room | Stored only in your browser (`chrome.storage.local`) |
+| Server username and password (optional) | To log in to the MQTT server you configured | Stored in your browser (`chrome.storage.local`) and sent only to that server when connecting |
+| Room code, server address, interface preferences | To connect to your room | Stored only in your browser (`chrome.storage.local`) |
 
 ## What the extension does not do
 
