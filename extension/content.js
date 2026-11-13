@@ -762,6 +762,20 @@
     });
 
     pill.querySelector('.ps-sync').addEventListener('click', () => {
+      if (!state.settings.broker) {
+        showToast(L('needServer'));
+        return;
+      }
+      if (!state.settings.room) {
+        showToast(L('needRoom'));
+        return;
+      }
+      if (!state.settings.enabled) {
+        state.settings.enabled = true;
+        persistSettings();
+        showToast(L('joiningRoom'));
+        return;
+      }
       requestRemoteState();
       showToast(L('askingPosition'));
     });
@@ -1256,7 +1270,11 @@
     state.port.onMessage.addListener((message) => {
       if (!message) return;
       if (message.type === 'status') {
+        const wasConnected = state.status === 'connected';
         state.status = message.status;
+        if (!wasConnected && state.status === 'connected' && state.video) {
+          requestRemoteState();
+        }
         render();
       } else if (message.type === 'remote') {
         applyRemote(message.payload);
