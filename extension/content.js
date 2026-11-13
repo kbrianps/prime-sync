@@ -1020,13 +1020,16 @@
       if (sendChat(input.value)) {
         input.value = '';
         input.style.height = '';
+        input.style.overflowY = '';
       }
       input.focus();
     });
 
     input.addEventListener('input', () => {
       input.style.height = 'auto';
-      input.style.height = Math.min(input.scrollHeight, 96) + 'px';
+      const height = input.scrollHeight + input.offsetHeight - input.clientHeight;
+      input.style.height = Math.min(height, 96) + 'px';
+      input.style.overflowY = height > 96 ? 'auto' : 'hidden';
     });
 
     panel.querySelector('.ps-panel-min').addEventListener('click', () => {

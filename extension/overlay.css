@@ -499,8 +499,10 @@
   font: inherit;
   line-height: 1.35;
   resize: none;
-  overflow-y: auto;
+  overflow-y: hidden;
   max-height: 96px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ps-border-strong) transparent;
   transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
