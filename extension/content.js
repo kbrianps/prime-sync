@@ -50,6 +50,8 @@
     pausedBy: null, // { mine: bool, name: string, at: number }
     drift: 0,
     remoteTitle: '',
+    content: { ep: '', show: '', lang: '' },
+    mismatch: null,
     root: null,
     overlay: null,
     tab: null,
@@ -102,6 +104,37 @@
       .replace(/\s*[|\-–]\s*Amazon\.\w+.*$/i, '')
       .trim()
       .slice(0, 120);
+  }
+
+  function textOf(selector) {
+    const el = document.querySelector(selector);
+    return el ? String(el.textContent || '').trim() : '';
+  }
+
+  function episodeKey(text) {
+    const match = String(text || '').match(/(\d+)\D+?(\d+)/);
+    return match ? 'S' + Number(match[1]) + 'E' + Number(match[2]) : '';
+  }
+
+  function refreshContent() {
+    const subtitle = textOf('.atvwebplayersdk-subtitle-text');
+    const show = textOf('.atvwebplayersdk-title-text').slice(0, 120);
+    if (show) state.content.show = show;
+    if (subtitle) state.content.ep = episodeKey(subtitle);
+    else if (show) state.content.ep = '';
+    state.content.lang = String(document.documentElement.lang || '').toLowerCase();
+  }
+
+  function differentContent(message) {
+    const mine = state.content;
+    if (mine.ep && message.ep && mine.ep !== message.ep) return true;
+    return Boolean(
+      mine.show &&
+        message.show &&
+        mine.lang &&
+        mine.lang === message.lang &&
+        mine.show !== message.show
+    );
   }
 
   function truncate(text, max) {
@@ -286,7 +319,10 @@
     let text = '';
     let tone = 'warn';
 
-    if (paused && state.pausedBy) {
+    if (state.mismatch && Date.now() - state.mismatch.at < 15000) {
+      const { name, ep } = state.mismatch;
+      text = ep ? L('otherEpisode', { name, ep }) : L('otherTitle', { name });
+    } else if (paused && state.pausedBy) {
       text = state.pausedBy.mine
         ? L('youPaused')
         : L('namePaused', { name: state.pausedBy.name || L('partner') });
@@ -474,6 +510,8 @@
     state.video = video;
     state.buffering = false;
     state.cooldownUntil = 0;
+    state.content = { ep: '', show: '', lang: '' };
+    state.mismatch = null;
     if (!video) return;
     for (const event of EVENTS) {
       video.addEventListener(event, onLocalEvent, true);
@@ -550,6 +588,9 @@
         playing: !video.paused && !video.ended,
         rate: state.userRate || 1,
         title: shortTitle(),
+        ep: state.content.ep,
+        show: state.content.show,
+        lang: state.content.lang,
         name: (state.settings.name || '').slice(0, 24),
         slow: isLocalSlow(),
       },
@@ -594,6 +635,23 @@
 
     const video = state.video;
     if (!video) return;
+
+    refreshContent();
+    if (differentContent(message)) {
+      const name = peer.name || L('yourPartner');
+      if (!state.mismatch) {
+        showToast(L('otherContentToast', { name }));
+      }
+      state.mismatch = { name, ep: message.ep || '', at: now };
+      state.drift = 0;
+      restoreRate(video);
+      render();
+      return;
+    }
+    if (state.mismatch) {
+      state.mismatch = null;
+      render();
+    }
 
     // Janela pós-ação local: ignora estados que saíram antes dela.
     if (now < state.localPriorityUntil) return;
@@ -1202,6 +1260,8 @@
     }
 
     if (!video) return;
+
+    refreshContent();
 
     // rede de segurança: se o 'waiting' nunca foi seguido de 'playing'
     if (state.buffering && video.readyState >= 3) state.buffering = false;
