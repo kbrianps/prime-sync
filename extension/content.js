@@ -21,6 +21,9 @@
   const LOCAL_PRIORITY_MS = 700; // janela em que uma ação local vence
   const UI_GUARD_MS = 400; // clique/tecla no chat não pode mexer no player
 
+  const PEER_SILENT_MS = 25000;
+  const PEER_GONE_MS = 5 * 60000;
+
   const CHAT_MAX = 500;
   const CHAT_HISTORY = 200;
   const MIN_PANEL_HEIGHT = 140;
@@ -625,6 +628,7 @@
     peer.lastSeenAt = now;
     if (message.name) peer.name = String(message.name).slice(0, 24);
     if (typeof message.slow === 'boolean') peer.slow = message.slow;
+    if (typeof message.ep === 'string') peer.ep = message.ep.slice(0, 12);
     state.peers.set(message.who, peer);
 
     if (message.kind === 'health') {
@@ -903,6 +907,52 @@
       sub.textContent = room ? L('roomStatus', { room, status: text }) : text;
       state.chat.panel.querySelector('.ps-panel-dot').style.background = color;
     }
+
+    renderPeople();
+  }
+
+  function renderPeople() {
+    const box = state.chat.panel && state.chat.panel.querySelector('.ps-people');
+    if (!box) return;
+
+    const now = Date.now();
+    const mine = state.content.ep;
+    const people = [{ name: L('you'), ep: mine, on: true }];
+    for (const peer of state.peers.values()) {
+      const age = now - (peer.lastSeenAt || 0);
+      if (age > PEER_GONE_MS) continue;
+      people.push({
+        name: peer.name || L('noName'),
+        ep: peer.ep || '',
+        on: age < PEER_SILENT_MS,
+      });
+    }
+
+    const key = JSON.stringify(people);
+    if (box.dataset.key === key) return;
+    box.dataset.key = key;
+
+    const label = document.createElement('span');
+    label.className = 'ps-people-label';
+    label.textContent = L('inRoom');
+
+    const chips = people.map((person) => {
+      const chip = document.createElement('span');
+      chip.className = 'ps-person';
+      if (person.on) chip.classList.add('ps-on');
+      const name = document.createElement('b');
+      name.textContent = person.name;
+      chip.append(name);
+      if (person.ep) {
+        const ep = document.createElement('i');
+        ep.textContent = person.ep;
+        if (mine && person.ep !== mine) ep.classList.add('ps-diff');
+        chip.append(ep);
+      }
+      return chip;
+    });
+
+    box.replaceChildren(label, ...chips);
   }
 
   /* ----------------------------------------------------------------- chat */
@@ -927,6 +977,7 @@
       ICONS.close +
       '</button>' +
       '</div>' +
+      '<div class="ps-people"></div>' +
       '<div class="ps-msgs"></div>' +
       '<form class="ps-compose">' +
       '<textarea class="ps-input" rows="1" maxlength="' +
@@ -1242,6 +1293,7 @@
   function loop() {
     ensureUI();
     renderChip();
+    renderPeople();
     checkPeerHealth();
 
     const video = pickVideo();
@@ -1334,6 +1386,7 @@
         state.chat.messages = [];
         state.chat.seen = new Set();
         state.chat.unread = 0;
+        state.peers.clear();
         renderChat(true);
       }
 
