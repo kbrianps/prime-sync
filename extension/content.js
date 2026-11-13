@@ -300,7 +300,7 @@
     const remote = peerHealth();
     if (remote.slow && !state.peerSlowNotified) {
       state.peerSlowNotified = true;
-      showToast(L('partnerBadNet', { name: remote.name || L('yourPartner') }));
+      showToast(L('partnerBadNet', { name: remote.name || L('someone') }));
     } else if (!remote.slow) {
       state.peerSlowNotified = false;
     }
@@ -328,16 +328,16 @@
     } else if (paused && state.pausedBy) {
       text = state.pausedBy.mine
         ? L('youPaused')
-        : L('namePaused', { name: state.pausedBy.name || L('partner') });
+        : L('namePaused', { name: state.pausedBy.name || L('someone') });
       tone = 'pause';
     } else if (isLocalSlow()) {
       text = L('yourConnection');
     } else if (peerHealth().silent) {
-      text = L('noSignal', { name: peerHealth().name || L('partner') });
+      text = L('noSignal', { name: peerHealth().name || L('someone') });
       tone = 'off';
     } else if (peerHealth().slow) {
       const name = peerHealth().name;
-      text = name ? L('nameSlow', { name }) : L('partnerSlow');
+      text = name ? L('nameSlow', { name }) : L('someoneSlow');
     }
 
     chip.textContent = text;
@@ -642,7 +642,7 @@
 
     refreshContent();
     if (differentContent(message)) {
-      const name = peer.name || L('yourPartner');
+      const name = peer.name || L('someone');
       if (!state.mismatch) {
         showToast(L('otherContentToast', { name }));
       }
@@ -1180,7 +1180,7 @@
     state.chat.messages.push({
       id,
       mine: message.who === WHO,
-      name: String(message.name || 'Parceiro').slice(0, 24),
+      name: String(message.name || L('someone')).slice(0, 24),
       text: String(message.text).slice(0, CHAT_MAX),
       time: new Date().toLocaleTimeString(globalThis.PrimeSyncI18n.locale(state.settings.lang), {
         hour: '2-digit',
