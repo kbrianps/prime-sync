@@ -14,6 +14,10 @@
 </p>
 
 <p align="center">
+  <a href="https://www.buymeacoffee.com/kbrianps"><img src="https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=&slug=kbrianps&button_colour=242424&font_colour=ffffff&font_family=Lato&outline_colour=ffffff&coffee_colour=FFDD00" alt="Buy me a coffee"></a>
+</p>
+
+<p align="center">
   <img src="docs/player-en.png" alt="Control pill and room chat over the video" width="820">
 </p>
 

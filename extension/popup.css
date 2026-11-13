@@ -532,3 +532,10 @@ button {
 .link-row:hover .trail {
   color: var(--text);
 }
+
+.link-row .bmc {
+  width: 13px;
+  height: 18px;
+  margin: 0 2px;
+  stroke: none;
+}
