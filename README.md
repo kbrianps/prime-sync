@@ -6,7 +6,7 @@
 
 <p align="center">
   Watch Prime Video together, each person in their own home.<br>
-  When one of you plays, pauses or skips, the other screen does the same.
+  When one of you plays, pauses or skips, every other screen does the same.
 </p>
 
 <p align="center">
@@ -52,8 +52,8 @@
 ## What you need
 
 - **Chrome, Edge or Brave** on a computer (it does not work on phones or TVs).
-- **Prime Video** open in the browser, on both computers.
-- **An MQTT server** that both of you use (see Step 1).
+- **Prime Video** open in the browser, on every computer.
+- **An MQTT server** that everyone in the room uses (see Step 1).
 - About **10 minutes** the first time. After that, just open and watch.
 
 ---
@@ -61,17 +61,17 @@
 ## Step 1 — Choose a server
 
 Think of the server as a **mail carrier**: when you pause, the extension sends
-it a note saying "paused at 12:30", and it delivers that note right away to the
-other person's browser. The technical name for this carrier is an **MQTT
+it a note saying "paused at 12:30", and it delivers that note right away to
+everyone else's browser. The technical name for this carrier is an **MQTT
 broker**.
 
-The extension **does not ship with a server**. You pick one and both of you
-use the same one. All you need from it is an **address that starts with
+The extension **does not ship with a server**. You pick one and everyone uses
+the same one. All you need from it is an **address that starts with
 `wss://`** (and, if the service asks for one, a username and password).
 
 | Option | Good for | Cost |
 | --- | --- | --- |
-| **Hosted cloud service** (for example, the free plan of HiveMQ Cloud or EMQX Cloud Serverless) | People who don't want to install anything | Free for two people |
+| **Hosted cloud service** (for example, the free plan of HiveMQ Cloud or EMQX Cloud Serverless) | People who don't want to install anything | Free for a small group |
 | **Your own server** (Mosquitto on a computer or VPS you own) | People who already run servers | Whatever your server costs |
 | **EMQX public broker** (`wss://broker.emqx.io:8084/mqtt`) | Trying it right now, without signing up | Free |
 
@@ -85,7 +85,7 @@ With a cloud service, the path is usually:
    `wss://abc123.example-mqtt.cloud:8884/mqtt`.
 
 Keep the address, username and password. You will paste them in Step 3 and
-send them to the other person.
+send them to everyone who will watch.
 
 > ⚠️ **About the EMQX public broker.** It is run by the company behind EMQX
 > and is reliable, but it is **open**: anyone connected to it can see room
@@ -98,7 +98,7 @@ send them to the other person.
 
 ## Step 2 — Install the extension
 
-Do this **on both computers**.
+Do this **on every computer**.
 
 1. Get the `prime-sync-extension.zip` file (whoever built the package sends it
    by chat, Drive, etc.) and unzip it:
@@ -135,9 +135,9 @@ Click the Prime Sync icon (the ∞ in the browser toolbar):
 2. In **Your name in the chat**, type how you want to appear.
 3. In **Room code**, click the **arrows** button to create a code and the
    button next to it to **copy** it.
-4. Send the other person the **room code**, the **server address** and, if
-   any, the **username and password**. They fill in exactly the same on their
-   computer.
+4. Send everyone who will watch the **room code**, the **server address**
+   and, if any, the **username and password**. They fill in exactly the same
+   on their computers.
 5. Click **OK**. Everything is saved automatically.
 
 The room code never expires. You can keep the same one forever.
@@ -148,21 +148,25 @@ The room code never expires. You can keep the same one forever.
 
 ## Step 4 — Watch together
 
-1. Both of you open Prime Video **on the same episode or movie**.
+1. Everyone opens Prime Video **on the same episode or movie**.
 2. If the Prime tab was already open before installing, press **F5** on it.
 3. The Prime Sync **pill** shows up in the bottom-left corner of the video.
    **Green** dot and "Connected" = all good.
 4. Press play. From then on, play, pause, skipping forward and back happen on
-   both screens.
-5. If it drifts out of step, click **Sync** on the pill.
+   every screen.
+5. If it drifts out of step, click **Sync** on the pill. If the pill says
+   "Off", the same button turns sync on and joins the room.
 
-To test it: pause on your screen and check that the other one pauses too.
+To test it: pause on your screen and check that the others pause too.
 
 ---
 
 ## Room chat
 
 - Click **Chat** on the pill to open the conversation next to the video.
+- At the top, **In the room** lists everyone with the episode they are on.
+  Green dot = active, gray = no signal. An episode in yellow is not the one
+  you are on.
 - Type and press **Enter** to send (**Shift+Enter** for a new line).
 - With the chat closed, new messages show up as a notice in the corner and as
   a counter on the **Chat** button.
@@ -184,11 +188,13 @@ left edge of the screen; click it to bring the interface back.
 | 🟡 Connecting… | Trying to reach the server |
 | 🟡 Set up the server / the room | Something is missing in the Prime Sync icon |
 | 🔴 Offline | Could not reach the server |
+| ⚪ Off | Sync is turned off. Click **Sync** to turn it on and join the room |
 | `⏸ Bia paused` | Who paused the video |
 | `⚠ your connection` | **Your** internet is making the video stall |
-| `⚠ Bia lagging` | The **other person's** internet is stalling |
-| `⚠ Bia no signal` | No news from the other person for over 25 seconds |
-| `+1.4s` | Time difference between the two screens (fixed automatically) |
+| `⚠ Bia is on S1E4` | Bia is on **a different episode**. Sync is on hold until you open the same one |
+| `⚠ Bia lagging` | **Bia's** internet is stalling |
+| `⚠ Bia no signal` | No news from Bia for over 25 seconds |
+| `+1.4s` | Time difference to the room (fixed automatically) |
 
 ---
 
@@ -223,8 +229,8 @@ Find the place where you see the problem, then the line that matches it.
 | --- | --- | --- |
 | The pill does not appear | Tab opened before installing or updating | Press **F5** on the Prime Video tab |
 | Pill says "Offline" but the popup says "Connected" | The extension was updated and the tab still runs the old version | Press **F5** on the Prime Video tab |
-| One person pauses and the other doesn't | Different room code or server | Open the popup on both computers and compare **letter by letter** |
-| Jumps to a strange time | You are on different episodes | Both open the same episode, then click **Sync** |
+| One person pauses and another doesn't | Different room code or server | Open the popup on each computer and compare **letter by letter** |
+| `⚠ Bia is on S1E4` and nothing syncs | You are on different episodes | Open the same episode. Sync comes back by itself |
 | Keeps drifting or jumping back and forth | One person's internet is slow (the pill shows `⚠ your connection` or `⚠ Bia lagging`) | Wait a few seconds. If it continues, pause, let the video load and play again |
 | Out of sync after an ad | Ads change the video time and may differ between you | Click **Sync** when the episode comes back |
 | Video pauses or plays when nobody touched it | On the public server, someone else may be using the same code | Create a new code with the arrows button, or switch to a private server |
@@ -232,14 +238,14 @@ Find the place where you see the problem, then the line that matches it.
 | Prime Video says too many screens are playing | Prime Video limits how many screens play at once on the same account | Close Prime Video on other devices, or use two accounts |
 | Subtitles or audio language differ | Each person chooses their own; the extension does not change them | Pick the same options in the player menu |
 | The pill covers part of the picture | — | Click `‹` on the pill to hide it. Click the handle on the left edge to bring it back |
-| `⚠ Bia no signal` while she is in another tab | The browser slows down background tabs with a paused video | Keep the Prime Video tab visible on both computers |
+| `⚠ Bia no signal` while she is in another tab | The browser slows down background tabs with a paused video | Keep the Prime Video tab visible on every computer |
 
 ### In the chat
 
 | What you see | Why | What to do |
 | --- | --- | --- |
 | "Not connected to the room" when sending | No connection to the server | Fix the connection first (see the popup table above) |
-| The other person shows up as "Someone" (or "Alguém") | They did not fill in their name | Ask them to fill in **Your name in the chat** |
+| Someone shows up as "Someone" (or "Alguém") | They did not fill in their name | Ask them to fill in **Your name in the chat** |
 | Old messages disappeared | The chat is not saved | That is expected: closing or reloading the tab clears it |
 | Leaving the room cleared the chat | Each room has its own conversation | Use the same code again to rejoin |
 
@@ -255,10 +261,10 @@ saved.
 
 - **No account data** (email, password, card) goes through the extension.
 - What travels through the server: the video position, whether it is playing
-  or paused, the speed, the episode title, your chat name and the messages.
+  or paused, the speed, the title and episode number, your chat name and the messages.
 - Everything goes **only through the server you configured**. The extension
   talks to nothing else.
-- The **room code works like a password** between the two of you. Don't
+- The **room code works like a password** for everyone in the room. Don't
   share it.
 - On a **public server without a password** (like the EMQX one), the code
   does not protect you: anyone connected can listen to every room at once and

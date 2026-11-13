@@ -6,7 +6,7 @@
 
 <p align="center">
   Assistam Prime Video juntos, cada um na sua casa.<br>
-  Quando um dá play, pausa ou avança, a tela do outro faz o mesmo.
+  Quando um dá play, pausa ou avança, a tela dos outros faz o mesmo.
 </p>
 
 <p align="center">
@@ -49,8 +49,8 @@
 ## O que você precisa
 
 - **Chrome, Edge ou Brave** no computador (não funciona no celular nem na TV).
-- **Prime Video** aberto no navegador, nos dois computadores.
-- **Um servidor MQTT** que os dois vão usar (explicado no Passo 1).
+- **Prime Video** aberto no navegador, em todos os computadores.
+- **Um servidor MQTT** que todos da sala vão usar (explicado no Passo 1).
 - Uns **10 minutos** na primeira vez. Depois é só abrir e assistir.
 
 ---
@@ -59,15 +59,15 @@
 
 Pense no servidor como um **carteiro**: quando você dá pause, a extensão manda
 um bilhete "pausei no minuto 12:30" para ele, e ele entrega na hora para o
-navegador da outra pessoa. O nome técnico desse carteiro é **broker MQTT**.
+navegador de todos os outros. O nome técnico desse carteiro é **broker MQTT**.
 
-A extensão **não vem com servidor nenhum**. Vocês escolhem um e os dois usam o
+A extensão **não vem com servidor nenhum**. Vocês escolhem um e todos usam o
 mesmo. Basta uma coisa dele: um **endereço que começa com `wss://`**
 (e, se o serviço pedir, um usuário e uma senha).
 
 | Opção | Para quem | Custo |
 | --- | --- | --- |
-| **Serviço pronto na nuvem** (por exemplo, o plano gratuito do HiveMQ Cloud ou do EMQX Cloud Serverless) | Quem não quer instalar nada | Grátis para o uso de duas pessoas |
+| **Serviço pronto na nuvem** (por exemplo, o plano gratuito do HiveMQ Cloud ou do EMQX Cloud Serverless) | Quem não quer instalar nada | Grátis para um grupo pequeno |
 | **Servidor próprio** (Mosquitto num computador ou VPS seu) | Quem já mexe com servidores | O do seu servidor |
 | **Servidor público da EMQX** (`wss://broker.emqx.io:8084/mqtt`) | Quem quer testar agora, sem cadastro | Grátis |
 
@@ -81,7 +81,7 @@ Usando um serviço na nuvem, em geral o caminho é:
    `wss://abc123.exemplo-mqtt.cloud:8884/mqtt`.
 
 Guarde o endereço, o usuário e a senha. Você vai colar no Passo 3 e mandar
-para a outra pessoa.
+para quem vai assistir.
 
 > ⚠️ **Sobre o servidor público da EMQX.** Ele é mantido pela empresa que faz
 > o EMQX e é confiável para funcionar, mas é **aberto**: qualquer pessoa
@@ -94,7 +94,7 @@ para a outra pessoa.
 
 ## Passo 2 — Instalar a extensão
 
-Faça isso **nos dois computadores**.
+Faça isso **em todos os computadores**.
 
 1. Baixe o arquivo `prime-sync-extension.zip` (quem montou o pacote manda por
    WhatsApp, Drive etc.) e descompacte:
@@ -132,9 +132,9 @@ no vídeo mudam juntos.
 2. Em **Seu nome no chat**, escreva como quer aparecer.
 3. Em **Código da sala**, clique no botão de **setinhas** para gerar um código
    e no botão ao lado para **copiar**.
-4. Mande para a outra pessoa: o **código da sala**, o **endereço do servidor**
-   e, se houver, o **usuário e a senha**. Ela preenche tudo igual no
-   computador dela.
+4. Mande para quem vai assistir: o **código da sala**, o **endereço do
+   servidor** e, se houver, o **usuário e a senha**. Cada um preenche tudo
+   igual no próprio computador.
 5. Clique em **OK**. Tudo é salvo automaticamente.
 
 O código da sala não expira. Vocês podem usar o mesmo para sempre.
@@ -145,21 +145,25 @@ O código da sala não expira. Vocês podem usar o mesmo para sempre.
 
 ## Passo 4 — Assistir juntos
 
-1. Os dois abrem o Prime Video **no mesmo episódio ou filme**.
+1. Todos abrem o Prime Video **no mesmo episódio ou filme**.
 2. Se a aba do Prime já estava aberta antes de instalar, aperte **F5** nela.
 3. No canto inferior esquerdo do vídeo aparece a **pílula** do Prime Sync.
    Bolinha **verde** e "Conectado" = tudo certo.
-4. Deem play. A partir daí, play, pause, avançar e voltar acontecem nas duas
-   telas.
-5. Se sentir que saiu do ritmo, clique em **Sincronizar** na pílula.
+4. Deem play. A partir daí, play, pause, avançar e voltar acontecem em todas
+   as telas.
+5. Se sentir que saiu do ritmo, clique em **Sincronizar** na pílula. Se a
+   pílula disser "Desligado", o mesmo botão liga o sync e entra na sala.
 
-Para testar: pause na sua tela e veja se pausa na outra.
+Para testar: pause na sua tela e veja se pausa nas outras.
 
 ---
 
 ## Chat da sala
 
 - Clique em **Chat** na pílula para abrir a conversa ao lado do vídeo.
+- No topo, **Na sala** mostra todo mundo e o episódio em que cada um está.
+  Bolinha verde = ativo, cinza = sem sinal. Episódio em amarelo = diferente
+  do seu.
 - Digite e aperte **Enter** para enviar (**Shift+Enter** pula linha).
 - Com o chat fechado, mensagens novas aparecem num aviso no canto e num
   contador no botão **Chat**.
@@ -181,11 +185,13 @@ esquerda da tela; clique nela para trazer de volta.
 | 🟡 Conectando… | Tentando falar com o servidor |
 | 🟡 Configure o servidor / a sala | Falta preencher algo no ícone do Prime Sync |
 | 🔴 Offline | Não conseguiu falar com o servidor |
+| ⚪ Desligado | O sync está desligado. Clique em **Sincronizar** para ligar e entrar na sala |
 | `⏸ Bia pausou` | Quem pausou o vídeo |
 | `⚠ sua conexão` | **Sua** internet está travando o vídeo |
-| `⚠ Bia lenta` | A internet **da outra pessoa** está travando |
-| `⚠ Bia sem sinal` | Faz mais de 25 segundos sem notícias da outra pessoa |
-| `+1.4s` | Diferença de tempo entre as duas telas (a extensão corrige sozinha) |
+| `⚠ Bia está no S1E4` | Bia está **em outro episódio**. O sync fica parado até vocês abrirem o mesmo |
+| `⚠ Bia lenta` | A internet **da Bia** está travando |
+| `⚠ Bia sem sinal` | Faz mais de 25 segundos sem notícias da Bia |
+| `+1.4s` | Diferença de tempo para a sala (a extensão corrige sozinha) |
 
 ---
 
@@ -220,8 +226,8 @@ Ache o lugar onde você vê o problema e depois a linha que combina com ele.
 | --- | --- | --- |
 | A pílula não aparece | Aba aberta antes de instalar ou atualizar | Aperte **F5** na aba do Prime Video |
 | Pílula diz "Offline", mas o popup diz "Conectado" | A extensão foi atualizada e a aba ainda roda a versão antiga | Aperte **F5** na aba do Prime Video |
-| Um pausa e o outro não | Código da sala ou servidor diferentes | Abra o popup nos dois computadores e compare **letra por letra** |
-| Pula para um tempo estranho | Vocês estão em episódios diferentes | Os dois abrem o mesmo episódio e clicam em **Sincronizar** |
+| Um pausa e outro não | Código da sala ou servidor diferentes | Abra o popup em cada computador e compare **letra por letra** |
+| `⚠ Bia está no S1E4` e nada sincroniza | Vocês estão em episódios diferentes | Abram o mesmo episódio. O sync volta sozinho |
 | Fica dessincronizando ou indo e voltando | A internet de alguém está lenta (a pílula mostra `⚠ sua conexão` ou `⚠ Bia lenta`) | Espere alguns segundos. Se continuar, pause, deixe o vídeo carregar e dê play de novo |
 | Dessincronizou depois de um anúncio | Anúncios mudam o tempo do vídeo e podem ser diferentes para cada um | Clique em **Sincronizar** quando o episódio voltar |
 | O vídeo pausa ou toca sem ninguém mexer | No servidor público, outra pessoa pode estar usando o mesmo código | Gere um código novo no botão de setinhas ou troque para um servidor privado |
@@ -229,14 +235,14 @@ Ache o lugar onde você vê o problema e depois a linha que combina com ele.
 | O Prime Video avisa que há telas demais tocando | O Prime Video limita quantas telas tocam ao mesmo tempo na mesma conta | Feche o Prime Video em outros aparelhos ou usem duas contas |
 | Legenda ou idioma do áudio diferentes | Cada um escolhe os seus; a extensão não mexe nisso | Escolham as mesmas opções no menu do player |
 | A pílula cobre parte da imagem | — | Clique na setinha `‹` da pílula para esconder. Clique na alça na borda esquerda para trazer de volta |
-| `⚠ Bia sem sinal` enquanto ela está em outra aba | O navegador desacelera abas em segundo plano com o vídeo pausado | Mantenham a aba do Prime Video visível nos dois computadores |
+| `⚠ Bia sem sinal` enquanto ela está em outra aba | O navegador desacelera abas em segundo plano com o vídeo pausado | Mantenham a aba do Prime Video visível em todos os computadores |
 
 ### No chat
 
 | O que aparece | Por quê | O que fazer |
 | --- | --- | --- |
 | "Sem conexão com a sala" ao enviar | Sem conexão com o servidor | Resolva a conexão primeiro (veja a tabela do popup acima) |
-| A outra pessoa aparece como "Alguém" (ou "Someone") | Ela não preencheu o nome | Peça para preencher **Seu nome no chat** |
+| Alguém aparece como "Alguém" (ou "Someone") | A pessoa não preencheu o nome | Peça para preencher **Seu nome no chat** |
 | Mensagens antigas sumiram | O chat não fica salvo | É esperado: fechar ou recarregar a aba apaga a conversa |
 | Sair da sala apagou o chat | Cada sala tem sua própria conversa | Use o mesmo código de novo para voltar |
 
@@ -252,10 +258,11 @@ configurações continuam salvas.
 
 - **Nenhum dado da sua conta** (e-mail, senha, cartão) passa pela extensão.
 - O que viaja pelo servidor: a posição do vídeo, se está tocando ou pausado, a
-  velocidade, o título do episódio, seu nome no chat e as mensagens.
+  velocidade, o título e o número do episódio, seu nome no chat e as
+  mensagens.
 - Tudo passa **só pelo servidor que vocês configuraram**. A extensão não
   conversa com mais ninguém.
-- O **código da sala funciona como uma senha** entre vocês dois. Não divulgue.
+- O **código da sala funciona como uma senha** para todos da sala. Não divulgue.
 - Num servidor **público sem senha** (como o da EMQX), o código não protege:
   qualquer pessoa conectada pode escutar todas as salas de uma vez e mandar
   comandos. O popup mostra um aviso amarelo enquanto ele estiver em uso. Para
