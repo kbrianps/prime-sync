@@ -275,10 +275,17 @@
     let slow = false;
     let name = '';
     let lastSeen = 0;
+    let silent = false;
+    let silentName = '';
 
     for (const peer of state.peers.values()) {
       if (!peer.lastSeenAt) continue;
       if (peer.lastSeenAt > lastSeen) lastSeen = peer.lastSeenAt;
+      const age = now - peer.lastSeenAt;
+      if (!silent && age > PEER_SILENT_MS && age < PEER_GONE_MS) {
+        silent = true;
+        silentName = peer.name || '';
+      }
       if (peer.slow && now - peer.lastSeenAt < 15000) {
         slow = true;
         if (!name) name = peer.name || '';
@@ -291,9 +298,7 @@
       }
     }
 
-    const silent =
-      lastSeen > 0 && now - lastSeen > 25000 && now - lastSeen < 5 * 60000;
-    return { slow, silent, name, lastSeen };
+    return { slow, silent, name, silentName, lastSeen };
   }
 
   function checkPeerHealth() {
@@ -333,7 +338,7 @@
     } else if (isLocalSlow()) {
       text = L('yourConnection');
     } else if (peerHealth().silent) {
-      text = L('noSignal', { name: peerHealth().name || L('someone') });
+      text = L('noSignal', { name: peerHealth().silentName || L('someone') });
       tone = 'off';
     } else if (peerHealth().slow) {
       const name = peerHealth().name;
