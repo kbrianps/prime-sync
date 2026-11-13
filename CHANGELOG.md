@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.6.0
+
+- Sync goes on hold when people in the room are on different episodes, with a notice and a `⚠ Bia is on S1E4` chip. It resumes by itself once everyone opens the same episode.
+- The chat shows who is in the room, with the episode each person is on and whether they still have signal.
+- The Sync button turns sync on and joins the room when sync is off.
+- The extension asks the room for the current position every time the connection to the server comes back.
+- Texts refer to everyone in the room instead of a single partner, and "no signal" names whoever dropped, even with more than two people.
+- Buy me a coffee link in the popup and the READMEs.
+- Fixed: the chat input showed a scrollbar on a single line. It now grows only when needed.
+- Fixed: a chat message without a name showed "Parceiro" even with the English interface.
+
 ## 1.5.0
 
 - The MQTT server is now configured in the popup (address, optional username and password). No broker ships with the extension.

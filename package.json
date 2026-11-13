@@ -1,6 +1,6 @@
 {
   "name": "prime-sync",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "private": true,
   "description": "Extensão de navegador que sincroniza o Prime Video entre duas pessoas, com chat da sala.",
   "license": "GPL-3.0-only",

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Prime Sync",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Watch Prime Video together: play, pause and seek in sync, with a room chat. Independent, not affiliated with Amazon.",
   "permissions": ["storage", "alarms"],
   "host_permissions": [
